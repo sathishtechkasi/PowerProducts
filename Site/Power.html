@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharePoint Power Products | From Code to Configuration</title>
+    <style>
+        :root {
+            --sp-blue: #004578;
+            --sp-orange: #f35b1c;
+            --light-bg: #f8f9fa;
+            --text-dark: #323130;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 3px solid var(--sp-blue);
+        }
+
+        .logo-area h1 {
+            color: var(--sp-blue);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .logo-area span {
+            color: var(--sp-orange);
+        }
+
+        .tagline {
+            font-weight: 600;
+            color: var(--sp-blue);
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, var(--sp-blue) 0%, #0078d4 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .reduction-badge {
+            display: inline-block;
+            background: var(--sp-orange);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--sp-orange);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card h3 {
+            color: var(--sp-blue);
+            margin-top: 0;
+        }
+
+        .product-card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 8px 16px;
+            background-color: var(--sp-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: #323130;
+            color: white;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>SharePoint <span>Power</span> Products</h1>
+            <p class="tagline">Reducing Development Time By 80% | From Code to Configuration</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero-banner">
+            <h2>Accelerate Your SharePoint Development</h2>
+            <p>Stop writing repetitive code. Switch to high-speed configuration with our suite of power tools.</p>
+            <div class="reduction-badge">80% Reduction in Dev Time</div>
+        </section>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <h3>SharePoint Power Form</h3>
+                <p>Create complex, responsive forms with advanced logic without writing a single line of JavaScript.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="product-card">
+                <h3>SharePoint Power Data Synchronizer</h3>
+                <p>Seamlessly sync data between SharePoint lists, libraries, and external SQL databases with ease.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="product-card">
+                <h3>SharePoint Power Branding</h3>
+                <p>Instantly apply corporate themes and custom layouts across your entire tenant with configuration sliders.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="product-card">
+                <h3>SharePoint Power Flow</h3>
+                <p>Enhanced workflow visualizer and automation templates to bridge the gap in Power Automate.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="product-card">
+                <h3>SharePoint Power Dashboard</h3>
+                <p>Beautiful, real-time executive dashboards that aggregate data from multiple site collections.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="product-card">
+                <h3>SharePoint Power Report Builder</h3>
+                <p>Drag-and-drop report generation. Export professional PDF and Excel reports directly from SharePoint.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 SharePoint Power Products. All rights reserved.</p>
+        <p><small>Development &rarr; Configuration</small></p>
+    </footer>
+
+</body>
+</html>
