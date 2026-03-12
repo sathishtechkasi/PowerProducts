@@ -17,6 +17,7 @@ heft clean
 heft build --production
 heft package-solution --production
 
+npm run build:prod
 
 TODO
 Check all code upto latest and api

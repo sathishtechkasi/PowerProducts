@@ -6,8 +6,11 @@
     "node": ">=22.14.0 < 23.0.0"
   },
   "scripts": {
-    "build": "heft test --clean --production && heft package-solution --production",
-    "start": "heft start --clean",
+    "bump": "node increment-version.js",
+    "build:prod": "npm run bump && cross-env NODE_OPTIONS=--max_old_space_size=8192 heft build package-solution --production",
+    "build:clean": "heft clean && npm run build:prod",
+    "build": "npm run build:prod",
+    "start": "heft start",
     "clean": "heft clean",
     "eject-webpack": "heft eject-webpack"
   },
@@ -42,6 +45,7 @@
     "@types/react-dom": "17.0.17",
     "@types/webpack-env": "~1.15.2",
     "@typescript-eslint/parser": "8.46.2",
+    "cross-env": "^10.1.0",
     "css-loader": "~7.1.2",
     "eslint": "8.57.1",
     "eslint-plugin-react-hooks": "4.3.0",
