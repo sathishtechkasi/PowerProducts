@@ -1,7 +1,7 @@
 # =====================================================================
-# PowerForm Demo Provisioning Script
+# PowerForm Demo Provisioning Script (With Feature Descriptions)
 # =====================================================================
-$SiteUrl = "https://YOUR_TENANT.sharepoint.com/sites/YOUR_SITE"
+$SiteUrl = "https://m365powerproducts.sharepoint.com/sites/poweformdemo
 
 # Connect to SharePoint
 Connect-PnPOnline -Url $SiteUrl -Interactive
@@ -41,34 +41,60 @@ Write-Host "Creating Main Purchase Requests List..." -ForegroundColor Cyan
 # 4. Main List: Purchase Requests
 $mainList = New-PnPList -Title "Purchase Requests" -Template GenericList -Url "Lists/PurchaseRequests"
 
-# Add Fields
+# Add Fields and Set Descriptions for the Demo
 Add-PnPField -List "Purchase Requests" -DisplayName "VendorName" -InternalName "VendorName" -Type Text -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "VendorName" -Values @{Description="PowerForm Feature Showcased: Autocomplete (searches the Vendors list)."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "VendorEmail" -InternalName "VendorEmail" -Type Text -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "VendorEmail" -Values @{Description="PowerForm Feature Showcased: Column Mapping (Auto-fills when VendorName is selected)."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "VendorRating" -InternalName "VendorRating" -Type Number -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "VendorRating" -Values @{Description="PowerForm Feature Showcase: Column Mapping (Auto-fills when VendorName is selected)."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "Category" -InternalName "Category" -Type Lookup -LookupListId $catList.Id -LookupField "Title" -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "Category" -Values @{Description="PowerForm Feature Showcased: Standard Single Lookup."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "SubCategory" -InternalName "SubCategory" -Type Lookup -LookupListId $subList.Id -LookupField "Title" -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "SubCategory" -Values @{Description="PowerForm Feature Showcased: Cascade Lookup (Options are filtered automatically based on the Category selected)."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "Status" -InternalName "Status" -Type Choice -Choices "Draft","Pending Approval","Approved","Rejected" -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "Status" -Values @{Description="PowerForm Feature Showcased: Standard Dropdown / Choice."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "DeliveryLocations" -InternalName "DeliveryLocations" -Type MultiChoice -Choices "New York","London","Dubai","Tokyo" -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "DeliveryLocations" -Values @{Description="PowerForm Feature Showcased: Multi-Select Dropdown."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "TotalAmount" -InternalName "TotalAmount" -Type Currency -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "TotalAmount" -Values @{Description="PowerForm Feature Showcased: Standard Currency Input."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "IsUrgent" -InternalName "IsUrgent" -Type Boolean -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "IsUrgent" -Values @{Description="PowerForm Feature Showcased: Standard Checkbox / Toggle."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "DateRequired" -InternalName "DateRequired" -Type DateTime -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "DateRequired" -Values @{Description="PowerForm Feature Showcased: Standard Date Picker."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "PrimaryContact" -InternalName "PrimaryContact" -Type User -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "PrimaryContact" -Values @{Description="PowerForm Feature Showcased: Single Person/Group Picker."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "Watchers" -InternalName "Watchers" -Type UserMulti -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "Watchers" -Values @{Description="PowerForm Feature Showcased: Multi-Person/Group Picker."}
+
 Add-PnPField -List "Purchase Requests" -DisplayName "ReferenceLink" -InternalName "ReferenceLink" -Type URL -AddToDefaultView
+Set-PnPField -List "Purchase Requests" -Identity "ReferenceLink" -Values @{Description="PowerForm Feature Showcased: Hyperlink with URL and Description inputs."}
 
 # Add Rich Text Field
 $justField = Add-PnPField -List "Purchase Requests" -DisplayName "Justification" -InternalName "Justification" -Type Note -AddToDefaultView
-Set-PnPField -Identity $justField -Values @{RichText=$true}
+Set-PnPField -List "Purchase Requests" -Identity $justField -Values @{RichText=$true; Description="PowerForm Feature Showcased: Custom Rich Text Editor (RTE)."}
 
 # Add Plain Text Field (For the JSON Repeater Grid)
 $milestoneField = Add-PnPField -List "Purchase Requests" -DisplayName "Milestones" -InternalName "Milestones" -Type Note -AddToDefaultView
-Set-PnPField -Identity $milestoneField -Values @{RichText=$false}
+Set-PnPField -List "Purchase Requests" -Identity $milestoneField -Values @{RichText=$false; Description="PowerForm Feature Showcased: Repeater Grid (Stores tabular data as JSON array behind the scenes)."}
 
 # 5. Child List (For Line Items)
 Write-Host "Creating Child List..." -ForegroundColor Cyan
 $childList = New-PnPList -Title "PO Line Items" -Template GenericList -Url "Lists/POLineItems"
 Add-PnPField -List "PO Line Items" -DisplayName "Quantity" -InternalName "Quantity" -Type Number -AddToDefaultView
 Add-PnPField -List "PO Line Items" -DisplayName "UnitPrice" -InternalName "UnitPrice" -Type Currency -AddToDefaultView
-Add-PnPField -List "PO Line Items" -DisplayName "PurchaseRequestId" -InternalName "PurchaseRequestId" -Type Number -AddToDefaultView # Foreign Key
+Add-PnPField -List "PO Line Items" -DisplayName "PurchaseRequestId" -InternalName "PurchaseRequestId" -Type Number -AddToDefaultView 
+Set-PnPField -List "PO Line Items" -Identity "PurchaseRequestId" -Values @{Description="PowerForm Feature Showcased: Child List Foreign Key (Links back to Parent Purchase Request)."}
 
-Write-Host "✅ Provisioning Complete! You can now configure your web part." -ForegroundColor Green
+Write-Host "Provisioning Complete! You can now configure your web part." -ForegroundColor Green
