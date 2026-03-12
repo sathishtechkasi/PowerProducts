@@ -1,0 +1,4 @@
+docker-compose up -d
+
+chmod -R 777 /usr/app/spfx/packages/powerforms
+yo @microsoft/sharepoint --package-manager pnpm --no-insight

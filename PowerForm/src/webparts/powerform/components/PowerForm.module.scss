@@ -1,0 +1,669 @@
+
+@import '../../../../node_modules/@microsoft/sp-office-ui-fabric-core/dist/sass/_SPFabricCore.scss';
+
+//@import '~@fluentui/react/dist/sass/References.scss';
+/* ==========================================================================
+   GLOBAL SHAREPOINT OVERRIDES
+   These styles escape the CSS Modules scope (:global) to target 
+   standard SharePoint classes directly. This fixes layout issues 
+   like excessive padding or hidden page titles.
+   ========================================================================== */
+.propertyPaneDescription {
+  :global {
+    .ms-PropertyPaneDescription {
+      font-weight: bold;
+    }
+  }
+}
+
+:global {
+
+  /* Force full width for the web part container */
+  .CanvasZone,
+  .CanvasSection-col,
+  .ControlZone,
+  [data-automation-id="CanvasControl"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Remove default column padding */
+  .CanvasSection-col>div {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Hide the default Page Title area to reclaim space */
+  .pageTitle_dececfca,
+  div[class*="pageTitle_"] {
+    display: none !important;
+  }
+
+  /*  Apply negative margin to the canvas wrapper to remove whitespace */
+  div[data-automation-id="CanvasControl"],
+  .CanvasZone {
+    margin-top: -45px !important;
+  }
+
+  /* Target specific SharePoint wrapper class if present */
+  .canvasWrapper {
+    margin-top: -45px !important;
+  }
+}
+
+/* ==========================================================================
+   MAIN CONTAINER (.crudUi)
+   Wraps the entire application. Defines CSS Variables for theming.
+   ========================================================================== */
+.crudUi {
+  /* --- CSS Variables (Scoped) --- */
+  /* Default fallbacks (overridden by React inline styles from Property Pane) */
+  --bg: #f9fafb;
+  --panel: #ffffff;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  /* Dynamic Theme Variables */
+  --accent: #3b82f6;
+  /* Main Brand Color */
+  --accent-hover: #2563eb;
+  /* Darker shade for hover */
+  --danger: #ef4444;
+  /* Red for delete/error */
+  --success: #10b981;
+  /* Green for success states */
+  --warn: #f59e0b;
+  /* Orange/Yellow for warnings */
+
+  /* Global Font Settings */
+  color: #1f2937;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  font-size: 14px;
+  width: 100%;
+  /* Ensure container is responsive */
+
+  /* Ensure border-box is applied to all children */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* --- Helper Classes --- */
+  .hidden {
+    display: none !important;
+  }
+
+  /* ==========================================================================
+     HEADER SECTION (List Title + Search Bar)
+     ========================================================================== */
+  .header {
+    padding: 20px;
+    /* Uses the dynamic accent color for background */
+    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent));
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    /* Sticky header ensures it stays visible while scrolling long lists */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* Increased z-index to stay above table scroll */
+
+    display: flex;
+    flex-wrap: wrap;
+    /* Added wrap for responsiveness */
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    /* Added gap for mobile wrapping */
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+    }
+  }
+
+  /* Wrapper for action buttons (Add, Export, View Switcher) */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* ==========================================================================
+     BUTTON STYLES
+     ========================================================================== */
+  .btn {
+    border: none;
+    background: #ffffff;
+    color: #1f2937;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+
+    /* Hover Lift Effect */
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  /* Primary Action Button (Add, Save, Search) */
+  .btnPrimary {
+    background: var(--accent);
+    color: #fff;
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+
+    .icon {
+      stroke: #fff;
+    }
+  }
+
+  /* Danger Button (Delete) */
+  .btnDanger {
+    background: #ef4444;
+    color: #fff;
+
+    .icon {
+      stroke: #fff;
+    }
+  }
+
+  .btnGhost {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+
+  /* ==========================================================================
+     LIST VIEW / TABLE STYLES
+     ========================================================================== */
+
+  /* Highlight row when selected via checkbox */
+  .selectedRow {
+    background-color: #e0f2fe !important;
+    /* Light blue highlight */
+  }
+
+  .selectedRow:hover {
+    background-color: #bae6fd !important;
+    /* Darker blue on hover */
+  }
+
+  /* Search Bar Container */
+  .searchContainer {
+    flex: 1 1 260px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  /* Main Card Wrapper */
+  .card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: 10px;
+
+    /* Responsive adjustment for small screens */
+    @media (max-width: 640px) {
+      margin: 5px;
+      border-radius: 4px;
+    }
+  }
+
+  /* Scrollable Table Container */
+  .tableWrap {
+    overflow-x: auto;
+    /*  Enable horizontal scroll for responsive mobile view */
+    -webkit-overflow-scrolling: touch;
+    max-height: 600px;
+    width: 100%;
+  }
+
+  table {
+    width: 100%;
+    min-width: 600px;
+    /*  Prevents columns from squishing on small screens */
+    border-collapse: collapse;
+    font-size: 14px;
+
+    thead {
+      th {
+        position: sticky;
+        top: 0;
+        background: #f3f4f6;
+        padding: 10px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        vertical-align: bottom;
+        z-index: 5;
+        font-weight: 600;
+        color: #1f2937;
+
+        /* Filter inputs inside table headers */
+        .filterInput {
+          margin-top: 6px;
+          width: 100%;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          padding: 6px 8px;
+          font-size: 13px;
+          background: #fff;
+          display: block;
+
+          &:focus {
+            outline: 2px solid var(--accent);
+            border-color: transparent;
+          }
+        }
+      }
+    }
+
+    tbody {
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: top;
+        color: #1f2937;
+      }
+
+      tr:hover {
+        background: #f9fafb;
+      }
+    }
+  }
+
+  /* Status Tags (Active, Pending, Rejected, etc.) */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #e5e7eb;
+    color: #6b7280;
+
+    &.success {
+      background: #d1fae5;
+      color: #10b981;
+    }
+
+    &.warn {
+      background: #fef3c7;
+      color: #f59e0b;
+    }
+
+    &.danger {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+  }
+
+  .rowActions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  /* ==========================================================================
+     PAGINATION FOOTER
+     ========================================================================== */
+  .paginationFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .paginationInfo {
+      color: #6b7280;
+    }
+
+    .paginationControls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      button {
+        background: transparent;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #1f2937;
+
+        &:hover:not(:disabled) {
+          background: #e5e7eb;
+        }
+
+        &:disabled {
+          color: #d1d5db;
+          cursor: default;
+        }
+
+        &.active {
+          background: var(--accent);
+          color: #fff;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .perPage {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+
+      select {
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 4px 8px;
+        background: #fff;
+      }
+    }
+  }
+
+  /* ==========================================================================
+     FORM STYLES (Add / Edit / View)
+     ========================================================================== */
+  .formHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+
+    /* Applies the Theme Color */
+    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent));
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .formBody {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Grid Layouts controlled by Property Pane "Form Layout" */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    /* BREAKPOINT: Automatically stack to 1 column on tablets and mobile */
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .grid1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* IE11 / High Contrast fallback */
+  @media all and (-ms-high-contrast: none),
+  (-ms-high-contrast: active) {
+    .grid2 {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .grid2>div {
+      width: 48%;
+      margin-right: 2%;
+      margin-bottom: 10px;
+    }
+  }
+
+  /* Individual Form Field Container */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Standard Inputs */
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      background: #fff;
+      width: 100%;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+    }
+  }
+
+  .viewField {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #1f2937;
+    padding: 4px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  /* SVG Icons utility class */
+  .icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ==========================================================================
+     FORM GROUPING SECTIONS (Fieldset Style)
+     ========================================================================== */
+  .formSection {
+    position: relative;
+    border-radius: 12px;
+    /* Rounded corners */
+    padding: 25px 20px 20px 20px;
+    /* Padding inside the box */
+    margin-top: 15px;
+    /* Space for the title sticking out */
+    margin-bottom: 30px;
+    /* Space between sections */
+    background-color: #ffffff;
+
+    h3 {
+      position: absolute;
+      top: -12px;
+      /* Move title up to sit on the border */
+      left: 20px;
+      /* Indent from left */
+      background-color: #ffffff;
+      /* White background to hide the border behind text */
+      padding: 0 10px;
+      /* White space around the text */
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      /* Ensure title sits above the border */
+      z-index: 1;
+    }
+  }
+
+  /* ==========================================================================
+     PANEL OVERRIDES
+     Custom styling for the Side Panel (Office UI Fabric Panel)
+     ========================================================================== */
+  .panelNoPadding {
+    :global {
+
+      /* Remove padding from the main content area for full-width iframe */
+      .ms-Panel-content {
+        padding: 0px !important;
+        margin: 0px !important;
+      }
+
+      /* Ensure the scrollable area fills height and hides the native scrollbar */
+      .ms-Panel-scrollableContent {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* Adjust command bar spacing if present */
+      .ms-Panel-commands {
+        margin: 0;
+        padding-top: 10px;
+      }
+    }
+  }
+}
+
+.childSection {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.listTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+.gridInput {
+  width: 100%;
+  border: 1px solid transparent;
+  padding: 4px;
+
+  &:focus {
+    border-color: #0078d4;
+    outline: none;
+  }
+
+  &:hover {
+    border-color: #ccc;
+  }
+}
+
+.gridInput {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  /* Default border */
+  border-radius: 3px;
+  box-sizing: border-box;
+  /* Ensures padding doesn't break width */
+  font-size: 13px;
+
+  &:focus {
+    border-color: #0078d4;
+    outline: none;
+  }
+}
+
+/* Ensure the table fits nicely */
+.field {
+  /* ... existing styles ... */
+
+  table {
+    background-color: #fff;
+
+    th {
+      font-weight: 600;
+      color: #333;
+      background-color: #f3f2f1;
+    }
+
+    td {
+      vertical-align: top;
+    }
+  }
+}

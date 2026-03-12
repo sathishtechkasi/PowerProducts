@@ -1,0 +1,18 @@
+docker compose down
+docker compose build --no-cache
+docker compose run --rm spfxform
+
+yo @microsoft/sharepoint
+
+
+whoami
+echo $HOME
+node --version
+npm --version
+yo --version
+
+npx tsc --noEmit
+
+heft clean
+heft build --production
+heft package-solution --production
