@@ -35,7 +35,7 @@ export class NotificationService {
   }
 
   public static async logNotification(
-    siteUrl: string, 
+    siteUrl: string,
     listName: string,
     action: 'Added' | 'Updated' | 'Deleted' | 'Viewed',
     itemData: any,
@@ -136,9 +136,10 @@ export class NotificationService {
         .replace(/\sor\s/gi, " || ");
 
       // eslint-disable-next-line no-new-func
-      const func = new Function("item", `return ${jsExpr}`);
+      const FuncBuilder = (window as any).Function;
+      const func = new FuncBuilder("item", `return ${jsExpr}`);
       return func(evalItem);
-    } catch (e:any) {
+    } catch (e: any) {
       console.warn("[NotificationService] Syntax Error in Condition: " + condition);
       return false;
     }
@@ -168,7 +169,7 @@ export class NotificationService {
         },
         _TargetGroupsId: { results: targetGroups || [] }
       });
-    } catch (err:any) {
+    } catch (err: any) {
       console.error("[NotificationService] Failed to write to log list", err);
     }
   }

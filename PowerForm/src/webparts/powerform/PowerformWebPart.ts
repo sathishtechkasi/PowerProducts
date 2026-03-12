@@ -727,7 +727,7 @@ export default class PowerFormWebPart extends BaseClientSideWebPart<IPowerFormWe
   private siteGroups: { key: string; text: string }[] = [];
 
   private async configureNotificationPermissions(): Promise<void> {
-    const listName = "BAZnotifications";
+    const listName = "PowerNotifications";
     const roleName = this.properties.notifRoleName;
 
     if (!roleName) {
@@ -1124,13 +1124,13 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
           }
         },
           React.createElement('div', { style: { fontSize: '64px', marginBottom: '20px' } }, '📝'),
-          React.createElement('h2', { style: { margin: '0 0 10px 0', color: '#333', fontWeight: 600 } }, 'Welcome to BAZ Dynamic Form'),
+          React.createElement('h2', { style: { margin: '0 0 10px 0', color: '#333', fontWeight: 600 } }, 'Welcome to SharePoint Power Form'),
           React.createElement('p', { style: { margin: '0 0 20px 0', color: '#666', maxWidth: '500px', lineHeight: '1.6', fontSize: '15px' } },
-            'The form is not configured yet. Please configure it in order to use and enjoy the features of BAZ Dynamic Form.'
+            'The form is not configured yet. Please configure it in order to use and enjoy the features of SharePoint Power Form.'
           ),
           React.createElement('div', { style: { fontSize: '13px', color: '#888', marginTop: '10px', padding: '10px', background: '#f5f5f5', borderRadius: '4px' } },
             'If there is any query please contact ',
-            React.createElement('a', { href: 'mailto:admin@baztechnologies.ae', style: { color: '#0078d4', textDecoration: 'none', fontWeight: 600 } }, 'admin@baztechnologies.ae')
+            React.createElement('a', { href: 'mailto:admin@m365powerproducts.com', style: { color: '#0078d4', textDecoration: 'none', fontWeight: 600 } }, 'admin@m365powerproducts.com')
           ),
           React.createElement('button', {
             style: {
@@ -3003,7 +3003,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
                 groupName: "General Settings",
                 groupFields: [
                   PropertyPaneToggle('enableNotification', { label: "Enable Module" }),
-                  PropertyPaneLabel('lblNotifInfo', { text: "Ensure 'BAZnotifications' list exists." }),
+                  PropertyPaneLabel('lblNotifInfo', { text: "Ensure 'PowerNotifications' list exists." }),
                   PropertyPaneTextField('notifRoleName', { label: "Role Name (for Everyone)" }),
                   PropertyPaneButton('btnNotifPerms', {
                     text: "Configure Permissions",

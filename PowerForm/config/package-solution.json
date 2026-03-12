@@ -27,8 +27,8 @@
     },
     "features": [
       {
-        "title": "powerform Feature",
-        "description": "The feature that activates elements of the powerform solution.",
+        "title": "M365 Power Products - PowerForm Feature",
+        "description": "This feature will activate the PowerForm Features",
         "id": "74236e1d-33b6-48e8-a446-264880268e36",
         "version": "1.0.0.0"
       }

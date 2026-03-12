@@ -5,6 +5,7 @@ import "@pnp/sp/site-users";
 import "@pnp/sp/site-groups";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import "@pnp/sp/profiles";
 import { Web } from "@pnp/sp/webs";
 import { SPHttpClient, SPHttpClientResponse, ISPHttpClientOptions } from '@microsoft/sp-http';
 import Swal from 'sweetalert2';
@@ -67,9 +68,9 @@ class RichTextEditor extends React.Component<any, any> {
     super(props);
     this.state = { html: props.value || '' };
   }
-  public componentWillReceiveProps(nextProps: any) {
-    if (nextProps.value !== this.state.html && document.activeElement !== this.editor) {
-      this.setState({ html: nextProps.value });
+  public componentDidUpdate(prevProps: any) {
+    if (this.props.value !== prevProps.value && this.props.value !== this.state.html && document.activeElement !== this.editor) {
+      this.setState({ html: this.props.value });
     }
   }
   // Toolbar Action Helper
@@ -146,21 +147,13 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
   private service: CommonService;
   constructor(props: IPowerFormProps) {
     super(props);
-    //Parse Query Parameters (e.g. ?qmode=edit&itemId=5)    
+    // Parse Query Parameters (Modern Approach)
     const params = new URLSearchParams(window.location.search);
-    // Replacement helper using a standard loop for TS/ES5 compatibility
     const getParam = (key: string): string | null => {
       const lowerKey = key.toLowerCase();
-      const keys = (params as any).keys(); // Cast to any to bypass iteration errors
-      // Use a manual iterator or standard lookup
-      // Since you want case-insensitivity, we check the keys manually
       let result: string | null = null;
-      // URLSearchParams in ES5 often requires getting all entries manually
-      params.toString().split('&').forEach(pair => {
-        const parts = pair.split('=');
-        if (parts[0].toLowerCase() === lowerKey) {
-          result = decodeURIComponent(parts[1] || '');
-        }
+      params.forEach((value, key) => {
+        if (key.toLowerCase() === lowerKey && result === null) result = value;
       });
       return result;
     };
@@ -322,7 +315,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       //  Else If Can See Custom Views -> Use First Allowed View
       //  Else -> ACCESS DENIED (No views available)
       if (viewParam) {
-        const targetView = allowedViews.filter((v: any) => v.title.toLowerCase() === viewParam.toLowerCase() || v.id === viewParam)[0];
+        const targetView = allowedViews.find((v: any) => v.title.toLowerCase() === viewParam.toLowerCase() || v.id === viewParam);
         if (targetView) {
           initialViewId = targetView.id;
           initialViewFields = targetView.visibleFields;
@@ -606,7 +599,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         });
       }
       if (JSON.stringify(prevProps.childConfigs) !== JSON.stringify(this.props.childConfigs)) {
-        this.loadChildSchemas();
+        void this.loadChildSchemas();
       }
       //  NEW: Detect Lookup Config Changes (Property Pane updates)
       // If you add a Filter Query or change columns in the panel, this forces the lookups to reload immediately.
@@ -749,7 +742,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
     const rawConfig = this.props.cascadeConfig ? this.props.cascadeConfig[childFieldName] : null;
     const config: any = rawConfig;
     if (!config) return;
-    const fieldDef = this.state.fields.filter(f => f.InternalName === childFieldName)[0];
+    const fieldDef = this.state.fields.find(f => f.InternalName === childFieldName);
     if (!fieldDef || !fieldDef.LookupList) return;
     let listId = fieldDef.LookupList.replace(/^{|}$/g, '');
     try {
@@ -778,10 +771,13 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           });
         }
       }
-      const url = `${this.service.siteUrl}/_api/web/lists(guid'${listId}')/items?$select=${selectFields.join(',')}&$filter=${finalFilter}&$top=5000`;
-      const response = await this.props.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const data = await response.json();
-      const options: ILookupOption[] = data.value.map((item: any) => ({
+      // PnPjs: Fetch Cascade Options
+      const items = await this._sp.web.lists.getById(listId).items
+        .select(...selectFields)
+        .filter(finalFilter)
+        .top(5000)();
+        
+      const options: ILookupOption[] = items.map((item: any) => ({
         key: item.Id,
         text: item.Title,
         itemData: item
@@ -800,23 +796,29 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
   }
   private async loadFields(): Promise<void> {
     try {
-      const listMetaUrl = `${this.service.siteUrl}/_api/web/lists/getbytitle('${this.props.selectedList}')?$select=Id,EnableVersioning,RootFolder/ServerRelativeUrl,RootFolder/Name`;
-      const listRes = await this.props.spHttpClient.get(listMetaUrl, SPHttpClient.configurations.v1);
-      const listData = await listRes.json();
+      // PnPjs: Fetch list metadata
+      const listData = await this._sp.web.lists.getByTitle(this.props.selectedList)
+        .select('Id', 'EnableVersioning', 'RootFolder/ServerRelativeUrl', 'RootFolder/Name')
+        .expand('RootFolder')();
+
       const manualListUrl = `${this.service.siteUrl}/Lists/${this.props.selectedList}`;
+
       this.setState({
         listId: listData.Id,
         enableVersioning: listData.EnableVersioning,
         listUrl: manualListUrl
       });
-      const url = `${this.service.siteUrl}/_api/web/lists/getbytitle('${this.props.selectedList}')/fields?$filter=Hidden eq false and (ReadOnlyField eq false or InternalName eq 'Attachments')`;
-      const response: SPHttpClientResponse = await this.props.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const data = await response.json();
-      this.setState({ fields: data.value });
+
+      // PnPjs: Fetch list fields
+      const fieldsData = await this._sp.web.lists.getByTitle(this.props.selectedList).fields
+        .filter("Hidden eq false and (ReadOnlyField eq false or InternalName eq 'Attachments')")();
+
+      this.setState({ fields: fieldsData });
       // Wait for all lookups to load so URL parameters can match text values
       const lookupPromises: Promise<void>[] = [];
-      for (const field of data.value) {
-        if (field.FieldTypeKind === 7 && field.LookupList) {
+     for (const field of fieldsData) {
+        // Cast to 'any' because LookupList is not in the base IFieldInfo interface
+        if (field.FieldTypeKind === 7 && (field as any).LookupList) {
 
           lookupPromises.push(this.fetchLookupOptions(field));
         }
@@ -841,11 +843,11 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
     for (const conf of configs) {
       if (!conf.childListTitle) continue;
       try {
-        // Fetch fields for the child list
-        const url = `${this.service.siteUrl}/_api/web/lists/getbytitle('${conf.childListTitle}')/fields?$filter=Hidden eq false and ReadOnlyField eq false`;
-        const res = await this.props.spHttpClient.get(url, SPHttpClient.configurations.v1);
-        const data = await res.json();
-        cache[conf.childListTitle] = data.value;
+        // PnPjs: Fetch fields for the child list
+        const fieldsData = await this._sp.web.lists.getByTitle(conf.childListTitle).fields
+          .filter("Hidden eq false and ReadOnlyField eq false")();
+          
+        cache[conf.childListTitle] = fieldsData;
       } catch (e: any) {
         console.error("Error loading child list schema", e);
       }
@@ -862,127 +864,78 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
    */
   private applyUrlParameters(): void {
     try {
-      // Manual parsing to ensure compatibility
-      const query = window.location.search.substring(1); // Remove '?'
-      const vars = query.split('&');
+      const params = new URLSearchParams(window.location.search);
       const newFormData = { ...this.state.formData };
       const lockedFields: string[] = [];
       let hasChanges = false;
-      for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split('=');
-        if (!pair[0]) continue; // Skip empty
-        const paramKey = decodeURIComponent(pair[0]);
-        const paramVal = decodeURIComponent(pair[1] || '');
-        // Skip standard params
-        if (paramKey.toLowerCase() === 'qmode' || paramKey.toLowerCase() === 'itemid') continue;
-        //  Find Field (Replacement for .find)
-        let field: ColumnDefinition | undefined;
-        const fields = this.state.fields;
-        for (let j = 0; j < fields.length; j++) {
-          if (fields[j].EntityPropertyName === paramKey || fields[j].InternalName === paramKey) {
-            field = fields[j];
-            break;
-          }
-        }
-        //  Check ID Reference (e.g. CountryId -> Country)
+
+      params.forEach((rawVal, rawKey) => {
+        const paramKey = decodeURIComponent(rawKey);
+        const paramVal = decodeURIComponent(rawVal);
+
+        // Skip system params (return acts as 'continue' inside a forEach)
+        if (paramKey.toLowerCase() === 'qmode' || paramKey.toLowerCase() === 'itemid') return;
+
+        let field = this.state.fields.find(f => f.EntityPropertyName === paramKey || f.InternalName === paramKey);
         let isIdReference = false;
-        if (!field && paramKey.toLowerCase().indexOf('id') === (paramKey.length - 2)) {
+
+        // Check if param is an ID reference (e.g. CountryId -> Country)
+        if (!field && paramKey.toLowerCase().endsWith('id')) {
           const baseName = paramKey.substring(0, paramKey.length - 2);
-          for (let j = 0; j < fields.length; j++) {
-            if (fields[j].EntityPropertyName === baseName || fields[j].InternalName === baseName) {
-              field = fields[j];
-              isIdReference = true;
-              break;
-            }
-          }
+          field = this.state.fields.find(f => f.EntityPropertyName === baseName || f.InternalName === baseName);
+          if (field) isIdReference = true;
         }
+
         if (field) {
           const key = field.EntityPropertyName;
           let finalVal: any = paramVal;
           const type = field.TypeAsString;
-          // --- Type Handling ---
-          // A. Number / Currency
+
           if (type === 'Number' || type === 'Currency') {
             finalVal = parseFloat(paramVal);
             if (isNaN(finalVal)) finalVal = null;
-          }
-          // B. Boolean
-          else if (type === 'Boolean') {
+          } else if (type === 'Boolean') {
             finalVal = (paramVal.toLowerCase() === 'true' || paramVal === '1');
-          }
-          // C. Lookup / User
-          else if (type === 'Lookup' || type === 'User' || type === 'LookupMulti' || type === 'UserMulti') {
+          } else if (type === 'Lookup' || type === 'User' || type === 'LookupMulti' || type === 'UserMulti') {
             const numVal = parseInt(paramVal, 10);
-            // Case 1: Value is a Number (ID) -> Use directly
             if (!isNaN(numVal)) {
               finalVal = numVal;
-            }
-            // Case 2: Value is Text -> Find ID in loaded options (No .find)
-            else if (!isIdReference) {
+            } else if (!isIdReference) {
               const opts = this.state.lookupOptions[key] || [];
-              let match = null;
-              // Loop to find match
-              for (let k = 0; k < opts.length; k++) {
-                if (opts[k].text && opts[k].text.toLowerCase() === paramVal.toLowerCase()) {
-                  match = opts[k];
-                  break;
-                }
-              }
+              const match = opts.find(o => o.text && o.text.toLowerCase() === paramVal.toLowerCase());
               if (match) {
                 finalVal = Number(match.key);
               } else {
-                void LoggerService.log(
-                  'PowerForm - applyUrlParameters',
-                  'Medium',
-                  this.state.itemId ? this.state.itemId.toString() : 'N/A',
-                  `[PowerForm] URL Parameter: Could not find lookup option for '${paramVal}' in field '${key}'`
-                );
+                void LoggerService.log('PowerForm', 'Medium', 'N/A', `URL Param: No lookup match for '${paramVal}'`);
                 finalVal = null;
               }
             }
-            // Handle Multi-Select (Expect array)
-            if ((type === 'LookupMulti' || type === 'UserMulti') && finalVal !== null) {
-              finalVal = [finalVal];
-            }
-          }
-          // D. Multi-Choice (Comma separated)
-          else if (type === 'MultiChoice') {
+            if ((type === 'LookupMulti' || type === 'UserMulti') && finalVal !== null) finalVal = [finalVal];
+          } else if (type === 'MultiChoice') {
             finalVal = paramVal.split(',').map(s => s.trim());
           }
-          // Apply Value
+
           if (finalVal !== null && finalVal !== undefined) {
             newFormData[key] = finalVal;
             lockedFields.push(key);
             hasChanges = true;
           }
         }
-      }
+      });
+
       if (hasChanges) {
-        this.setState({
-          formData: newFormData,
-          urlReadOnlyFields: lockedFields
-        }, () => {
-          // Re-trigger cascades if any parent field was set via URL
+        this.setState({ formData: newFormData, urlReadOnlyFields: lockedFields }, () => {
           if (this.props.cascadeConfig) {
-            const keys = Object.keys(this.props.cascadeConfig);
-            for (let i = 0; i < keys.length; i++) {
-              const childKey = keys[i];
-              const conf = this.props.cascadeConfig[childKey];
+            Object.keys(this.props.cascadeConfig).forEach(childKey => {
+              const conf = this.props.cascadeConfig![childKey];
               const parentVal = this.state.formData[conf.parentField];
-              if (parentVal) {
-                void this.loadCascadeOptions(childKey, parentVal);
-              }
-            }
+              if (parentVal) void this.loadCascadeOptions(childKey, parentVal);
+            });
           }
         });
       }
     } catch (error: any) {
-      void LoggerService.log(
-        'PowerForm - applyUrlParameters',
-        'Medium',
-        this.state.itemId ? this.state.itemId.toString() : 'N/A',
-        error.message || JSON.stringify(error)
-      );
+      void LoggerService.log('PowerForm - applyUrlParameters', 'Medium', 'N/A', error.message);
     }
   }
   private async fetchLookupOptions(field: ColumnDefinition): Promise<void> {
@@ -1010,14 +963,15 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           });
         }
       }
-      let queryParams = `$select=${selectFields.join(',')}`;
+      // PnPjs: Fetch Lookup Options
+      let query = this._sp.web.lists.getById(listId).items.select(...selectFields).top(5000);
       if (config && config.filterQuery) {
-        queryParams += `&$filter=(${config.filterQuery})`;
+        query = query.filter(config.filterQuery);
       }
-      const url = `${this.service.siteUrl}/_api/web/lists(guid'${listId}')/items?${queryParams}&$top=5000`;
-      const response = await this.props.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const data = await response.json();
-      const options: ILookupOption[] = data.value.map((item: any) => ({
+      
+      const items = await query();
+      
+      const options: ILookupOption[] = items.map((item: any) => ({
         key: item.Id,
         text: item.Title,
         itemData: item
@@ -1120,12 +1074,12 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
   private async ensureIndexedColumns(): Promise<void> {
     if (this.indexedFields.length > 0) return; // Already loaded
     try {
-      const r = await this.props.spHttpClient.get(
-        `${this.service.siteUrl}/_api/web/lists/getbytitle('${this.props.selectedList}')/fields?$select=InternalName,Indexed&$filter=Indexed eq true`,
-        SPHttpClient.configurations.v1
-      );
-      const data = await r.json();
-      this.indexedFields = data.value.map((f: any) => f.InternalName);
+      // PnPjs: Ensure indexed columns
+      const fieldsData = await this._sp.web.lists.getByTitle(this.props.selectedList).fields
+        .select('InternalName', 'Indexed')
+        .filter('Indexed eq true')();
+        
+      this.indexedFields = fieldsData.map((f: any) => f.InternalName);
     } catch (error: any) {
       void LoggerService.log(
         'PowerForm - ensureIndexedColumns',
@@ -1256,7 +1210,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           if (colsToSearch.indexOf('Title') === -1) colsToSearch.push('Title');
           colsToSearch.forEach(key => {
             if (['Attachments', 'ContentType', 'FileRef', 'Created', 'Modified'].indexOf(key) > -1) return;
-            const fieldDef = fieldsToCheck.filter(f => f.InternalName === key)[0];
+            const fieldDef = fieldsToCheck.find(f => f.InternalName === key);
             const type = fieldDef ? fieldDef.TypeAsString : 'Text';
             if (type === 'Number' || type === 'Currency') {
               const numVal = parseFloat(val);
@@ -1582,7 +1536,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         if (fFieldParam && fValue) {
           let realKey = fFieldParam;
           if (this.state.fields) {
-            const fieldDef = this.state.fields.filter(f => f.InternalName === fFieldParam || f.EntityPropertyName === fFieldParam)[0];
+            const fieldDef = this.state.fields.find(f => f.InternalName === fFieldParam || f.EntityPropertyName === fFieldParam);
             if (fieldDef) {
               realKey = fieldDef.EntityPropertyName;
             }
@@ -1635,7 +1589,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         let realKey = key;
         if (this.state.fields) {
           // Find the field where InternalName matches the filter key
-          const fieldDef = this.state.fields.filter(f => f.InternalName === key)[0];
+          const fieldDef = this.state.fields.find(f => f.InternalName === key);
           if (fieldDef) {
             realKey = fieldDef.EntityPropertyName;
           }
@@ -1870,11 +1824,10 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
                   // enable 'siteUserInfoList' property TS Error -> Use Root Web & GetByTitle
                   // We access the Site Root because User Info List lives there.
 
-                  // Ensure pnp is imported as: import * as pnp from 'sp-pnp-js';
+                  // We access the Site Root because User Info List lives there.
                   const rootWeb = Web([this._sp.web, this.props.context.pageContext.site.absoluteUrl]);
 
-                  // Note: "User Information List" is the standard title. 
-                  // If your site is in a different language, you might need to use the localized title or ID.
+                  // Note: "User Information List" is the standard title. // If your site is in a different language, you might need to use the localized title or ID.
                   const userInfoItem = await rootWeb.lists.getByTitle("User Information List").items.getById(uid)
                     .select('Id', 'Title', 'Name', 'EMail', 'ContentTypeId')
                     ();
@@ -2030,7 +1983,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
     );
   }
 
-  
+
   //  validateField: Merges errors and cleans up empty keys
   private validateField = async (field: ColumnDefinition, value: any): Promise<void> => {
     try {
@@ -2082,13 +2035,16 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
     if (!value || !value.toString().trim()) return '';
     const fieldInternalName = field.EntityPropertyName;
     const listName = this.props.selectedList;
-    // Fetch items with the same value (Limit to 5 to be safe)
-    const url = `${this.service.siteUrl}/_api/web/lists/getbytitle('${listName}')/items?$filter=${fieldInternalName} eq '${encodeURIComponent(value)}'&$top=5&$select=Id`;
     try {
-      const res = await this.props.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const data = await res.json();
+      // PnPjs: Fetch items with the same value (Limit to 5 to be safe)
+      const safeValue = String(value).replace(/'/g, "''"); // Escape single quotes for OData
+      const items = await this._sp.web.lists.getByTitle(listName).items
+        .filter(`${fieldInternalName} eq '${safeValue}'`)
+        .select('Id')
+        .top(5)();
+        
       // FILTER: Exclude the current item if we are in Edit Mode
-      const duplicates = data.value.filter((item: any) => {
+      const duplicates = items.filter((item: any) => {
         // If editing, and this item's ID matches the current Item ID, it's NOT a duplicate (it's the same item)
         if (this.state.mode === 'edit' && this.state.itemId && item.Id === this.state.itemId) {
           return false;
@@ -2170,7 +2126,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
             if (r.otherField && r.operator) {
               let otherKey = r.otherField;
               if (this.state.fields) {
-                const otherFieldDef = this.state.fields.filter(f => f.InternalName === r.otherField)[0];
+                const otherFieldDef = this.state.fields.find(f => f.InternalName === r.otherField);
                 if (otherFieldDef) otherKey = otherFieldDef.EntityPropertyName;
               }
               const otherVal = dataContext[otherKey];
@@ -2203,8 +2159,8 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           case 'custom': {
             if (r.fnBody) {
               try {
-                // eslint-disable-next-line no-new-func
-                const fn = new Function('value', 'formData', r.fnBody);
+                const FuncBuilder = (window as any).Function;
+                const fn = new FuncBuilder('value', 'formData', r.fnBody);
                 if (!fn(value, dataContext)) return r.message;
               } catch (error: any) {
                 void LoggerService.log('PowerForm - runCustomValidations', 'Medium', 'N/A', error.message);
@@ -2326,7 +2282,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         return;
       }
       //  Find the selected View config
-      const view = this.state.availableViews.filter(v => v.id === viewId)[0];
+      const view = this.state.availableViews.find(v => v.id === viewId);
       if (!view) return;
       //  Prepare Filters from the View
       let newFilters: any = {};
@@ -2397,7 +2353,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         // A. Check Autocomplete Config
         let acConfig = this.props.autocompleteConfig ? this.props.autocompleteConfig[fieldName] : null;
         if (!acConfig && this.props.autocompleteConfig && this.state.fields) {
-          const fieldMatch = this.state.fields.filter(function (f) { return f.EntityPropertyName === fieldName; })[0];
+          const fieldMatch = this.state.fields.find(function (f) { return f.EntityPropertyName === fieldName; });
           if (fieldMatch) {
             acConfig = this.props.autocompleteConfig[fieldMatch.InternalName];
           }
@@ -2408,7 +2364,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         // B. Check Lookup Config
         let luConfig = this.props.lookupDisplayConfig ? this.props.lookupDisplayConfig[fieldName] : null;
         if (!luConfig && this.state.fields) {
-          const fieldMatch = this.state.fields.filter(function (f) { return f.EntityPropertyName === fieldName; })[0];
+          const fieldMatch = this.state.fields.find(function (f) { return f.EntityPropertyName === fieldName; });
           const fInternal = fieldMatch ? fieldMatch.InternalName : null;
           if (fInternal && this.props.lookupDisplayConfig) {
             luConfig = this.props.lookupDisplayConfig[fInternal];
@@ -2420,7 +2376,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         // C. Check Cascade Config
         let casConfig = this.props.cascadeConfig ? this.props.cascadeConfig[fieldName] : null;
         if (!casConfig && this.state.fields) {
-          const fieldMatch = this.state.fields.filter(function (f) { return f.EntityPropertyName === fieldName; })[0];
+          const fieldMatch = this.state.fields.find(function (f) { return f.EntityPropertyName === fieldName; });
           const fInternal = fieldMatch ? fieldMatch.InternalName : null;
           if (fInternal && this.props.cascadeConfig) {
             casConfig = this.props.cascadeConfig[fInternal];
@@ -2431,7 +2387,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         }
       }
       //  Validate CURRENT Field
-      const fieldMeta = this.state.fields.filter(function (f) { return f.EntityPropertyName === fieldName; })[0];
+      const fieldMeta = this.state.fields.find(function (f) { return f.EntityPropertyName === fieldName; });
       if (fieldMeta) {
         let error = this.getStandardValidation(fieldMeta, value);
         if (!error) {
@@ -2444,9 +2400,9 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       Object.keys(config).forEach(otherInternalName => {
         if (fieldMeta && otherInternalName === fieldMeta.InternalName) return;
         const rules = config[otherInternalName];
-        const dependsOnCurrent = rules.some(r => r.type === 'compare' && r.otherField === fieldMeta.InternalName);
+      const dependsOnCurrent = fieldMeta ? rules.some(r => r.type === 'compare' && r.otherField === fieldMeta.InternalName) : false;
         if (dependsOnCurrent) {
-          const otherFieldDef = this.state.fields.filter(function (f) { return f.InternalName === otherInternalName; })[0];
+          const otherFieldDef = this.state.fields.find(function (f) { return f.InternalName === otherInternalName; });
           if (otherFieldDef) {
             const otherKey = otherFieldDef.EntityPropertyName;
             const otherValue = newFormData[otherKey];
@@ -2478,6 +2434,49 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       );
     }
   }
+  private _resolvePeopleSuggestions = async (filter: string): Promise<IPersonaProps[]> => {
+    if (!filter) return [];
+    try {
+     // Modern PnPjs People Search API
+      const results = await this._sp.profiles.clientPeoplePickerSearchUser({
+        QueryString: filter,
+        MaximumEntitySuggestions: 5,
+        AllowEmailAddresses: true,
+        PrincipalSource: 15, // All Sources
+        PrincipalType: 15    // Users + SecGroups + SPGroups
+      });
+
+      const suggestions = await Promise.all(results.map(async (r: any) => {
+        let userId = (r.EntityData && r.EntityData.SPUserID) ? r.EntityData.SPUserID :
+                     (r.EntityData && r.EntityData.SPGroupID) ? r.EntityData.SPGroupID : null;
+                     
+        // Ensure user exists in the site collection if we only have their Key
+        if (!userId && r.Key) {
+          try {
+            const ensureRes = await this._sp.web.ensureUser(r.Key);
+            if (ensureRes) userId = ensureRes.Id.toString();
+          } catch (e: any) {
+            return null;
+          }
+        }
+        
+        if (!userId) return null;
+        
+        return {
+          key: userId,
+          text: r.DisplayText,
+          primaryText: r.DisplayText,
+          secondaryText: (r.EntityData && r.EntityData.Email) ? r.EntityData.Email : (r.Description || r.EntityType),
+          imageInitials: r.DisplayText ? r.DisplayText.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : '?'
+        } as IPersonaProps;
+      }));
+      
+      return suggestions.filter((s): s is IPersonaProps => s !== null);
+    } catch (e: any) {
+      void LoggerService.log('PowerForm - _resolvePeopleSuggestions', 'Medium', 'N/A', e.message);
+      return [];
+    }
+  }
   //  handleChange: Safely merges errors and handles all logic
   private handleChange = (fieldName: string, value: any, fullItemData?: any): void => {
     try {
@@ -2497,7 +2496,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
               const val = fullItemData[map.source] || fullItemData[this.toODataName(map.source)];
 
               // Find Target Field Definition
-              const targetFieldDef = this.state.fields.filter(f => f.InternalName === map.target)[0];
+              const targetFieldDef = this.state.fields.find(f => f.InternalName === map.target);
               if (targetFieldDef) {
                 const targetKey = targetFieldDef.EntityPropertyName;
                 // Update Data
@@ -2521,7 +2520,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         let acConfig = this.props.autocompleteConfig ? this.props.autocompleteConfig[fieldName] : null;
         if (!acConfig && this.props.autocompleteConfig && this.state.fields) {
           // Fallback: Check by Internal Name if EntityPropertyName didn't match
-          const fieldMatch = this.state.fields.filter(f => f.EntityPropertyName === fieldName)[0];
+          const fieldMatch = this.state.fields.find(f => f.EntityPropertyName === fieldName);
           if (fieldMatch) {
             acConfig = this.props.autocompleteConfig[fieldMatch.InternalName];
           }
@@ -2533,7 +2532,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         // 2. Check Lookup Config
         let luConfig = this.props.lookupDisplayConfig ? this.props.lookupDisplayConfig[fieldName] : null;
         if (!luConfig && this.state.fields) {
-          const fieldMatch = this.state.fields.filter(f => f.EntityPropertyName === fieldName)[0];
+          const fieldMatch = this.state.fields.find(f => f.EntityPropertyName === fieldName);
           const fInternal = fieldMatch ? fieldMatch.InternalName : null;
           if (fInternal && this.props.lookupDisplayConfig) {
             luConfig = this.props.lookupDisplayConfig[fInternal];
@@ -2546,7 +2545,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         // 3. Check Cascade Config
         let casConfig = this.props.cascadeConfig ? this.props.cascadeConfig[fieldName] : null;
         if (!casConfig && this.state.fields) {
-          const fieldMatch = this.state.fields.filter(f => f.EntityPropertyName === fieldName)[0];
+          const fieldMatch = this.state.fields.find(f => f.EntityPropertyName === fieldName);
           const fInternal = fieldMatch ? fieldMatch.InternalName : null;
           if (fInternal && this.props.cascadeConfig) {
             casConfig = this.props.cascadeConfig[fInternal];
@@ -2558,7 +2557,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       }
 
       // --- SECTION B: VALIDATE CURRENT FIELD ---
-      const fieldMeta = this.state.fields.filter(f => f.EntityPropertyName === fieldName)[0];
+      const fieldMeta = this.state.fields.find(f => f.EntityPropertyName === fieldName);
       if (fieldMeta) {
         // 1. Standard Validation (Required, etc.)
         let error = this.getStandardValidation(fieldMeta, value);
@@ -2582,10 +2581,9 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
 
         const rules = config[otherInternalName];
         // Check if any rule for 'otherField' depends on 'currentField'
-        const dependsOnCurrent = rules.some(r => r.type === 'compare' && r.otherField === fieldMeta.InternalName);
-
+     const dependsOnCurrent = fieldMeta ? rules.some(r => r.type === 'compare' && r.otherField === fieldMeta.InternalName) : false;
         if (dependsOnCurrent) {
-          const otherFieldDef = this.state.fields.filter(f => f.InternalName === otherInternalName)[0];
+          const otherFieldDef = this.state.fields.find(f => f.InternalName === otherInternalName);
           if (otherFieldDef) {
             const otherKey = otherFieldDef.EntityPropertyName;
             const otherValue = newFormData[otherKey];
@@ -2797,7 +2795,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
 
       // Fallback Title Logic
       if (!parentTitle) {
-        const titleField = this.state.fields.filter(f => f.InternalName === 'Title')[0];
+        const titleField = this.state.fields.find(f => f.InternalName === 'Title');
         if (titleField) parentTitle = this.state.formData[titleField.EntityPropertyName];
       }
       if (!parentTitle) parentTitle = `Item ${parentId || 'New'}`;
@@ -3180,8 +3178,8 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
               document.head.appendChild(s);
             } else {
               try {
-                // eslint-disable-next-line no-new-func
-                const fn = new Function(line);
+                const FuncBuilder = (window as any).Function;
+                const fn = new FuncBuilder(line);
                 fn();
               } catch (error: any) {
                 void LoggerService.log('PowerForm - Custom JS Error', 'Medium', 'N/A', error.message);
@@ -3404,7 +3402,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       const data = itemsToExport.map(item => {
         const row: any = {};
         listCols.forEach(fName => {
-          const fDef = fields.filter(f => f.InternalName === fName)[0];
+          const fDef = fields.find(f => f.InternalName === fName);
           const raw = item[fName];
           let val = '';
           if (!fDef) {
@@ -3746,8 +3744,8 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         if (field.TypeAsString === 'DateTime') displayValue = this.formatDate_form(value, isDateOnly);
         if (field.TypeAsString.indexOf('User') > -1 || field.TypeAsString.indexOf('Lookup') > -1) {
           if (this.state.lookupOptions[key]) {
-            if (Array.isArray(value)) displayValue = value.map(v => { const o = this.state.lookupOptions[key].filter((op: any) => op.key === v)[0]; return o ? o.text : v; }).join(', ');
-            else { const found = this.state.lookupOptions[key].filter((op: any) => op.key === value)[0]; displayValue = found ? found.text : value; }
+            if (Array.isArray(value)) displayValue = value.map(v => { const o = this.state.lookupOptions[key].find((op: any) => op.key === v); return o ? o.text : v; }).join(', ');
+            else { const found = this.state.lookupOptions[key].find((op: any) => op.key === value); displayValue = found ? found.text : value; }
           }
           if (field.TypeAsString.indexOf('User') > -1) {
             const userIds = Array.isArray(value) ? value : (value ? [value] : []);
@@ -3859,8 +3857,8 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           const isOpenLookup = this.state.activePickerKey === key;
           let displayLookupValue = '';
           let currentIds: number[] = [];
-          if (isLookupMulti) { currentIds = Array.isArray(value) ? value : []; displayLookupValue = currentIds.map(id => { const m = rawOpts.filter((o: any) => o.key === id)[0]; return m ? m.text : id; }).join(', '); }
-          else if (value) { currentIds = [Number(value)]; const m = rawOpts.filter((o: any) => o.key === value)[0]; displayLookupValue = m ? m.text : value; }
+          if (isLookupMulti) { currentIds = Array.isArray(value) ? value : []; displayLookupValue = currentIds.map(id => { const m = rawOpts.find((o: any) => o.key === id); return m ? m.text : id; }).join(', '); }
+          else if (value) { currentIds = [Number(value)]; const m = rawOpts.find((o: any) => o.key === value); displayLookupValue = m ? m.text : value; }
           const searchLookupText = ((this.state.pickerSearch && this.state.pickerSearch[key]) || '').toLowerCase();
           const filteredLookupOpts = rawOpts.filter((o: any) => o && o.text && o.text.toLowerCase().indexOf(searchLookupText) > -1);
           return (
@@ -3926,21 +3924,40 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
             </div>
           );
         }
+       
         case 'User':
         case 'UserMulti': {
           const isUserMulti = field.TypeAsString === 'UserMulti' || field.AllowMultipleValues;
           const selectedIds = value ? (Array.isArray(value) ? value : [value]) : [];
           const selectedPersonas = selectedIds.map((id: number) => this.state.peopleOptions[id]).filter((p: any) => !!p);
+          
           return (
             <div key={key} className={styles.field} title={isRestricted ? restrictionMessage : ""}>
               <label>{field.Title} {field.Required && !effectiveReadOnly && <span style={{ color: 'red' }}>*</span>} {renderRestrictedIcon()}</label>
               <div style={{ pointerEvents: effectiveReadOnly ? 'none' : 'auto', opacity: effectiveReadOnly ? 0.6 : 1, ...restrictedStyle, padding: '4px', borderRadius: '4px' }}>
-                <NormalPeoplePicker onResolveSuggestions={async (filter: string): Promise<IPersonaProps[]> => { if (!filter) return []; const searchBody = { queryParams: { QueryString: filter, MaximumEntitySuggestions: 5, AllowEmailAddresses: true, PrincipalSource: 15, PrincipalType: 15 } }; try { const res = await this.props.spHttpClient.post(`${this.service.siteUrl}/_api/SP.UI.ApplicationPages.ClientPeoplePickerWebServiceInterface.clientPeoplePickerSearchUser`, SPHttpClient.configurations.v1, { body: JSON.stringify(searchBody) }); if (!res.ok) return []; const data = await res.json(); if (!data || !data.value) return []; const results = JSON.parse(data.value); if (!Array.isArray(results)) return []; const suggestions = await Promise.all(results.map(async (r: any) => { let userId = (r.EntityData && r.EntityData.SPUserID) ? r.EntityData.SPUserID : (r.EntityData && r.EntityData.SPGroupID) ? r.EntityData.SPGroupID : null; if (!userId && r.Key) { try { const ensureRes = await this._sp.web.ensureUser(r.Key); if (ensureRes) userId = ensureRes.Id.toString(); } catch (e: any) { return null; } } if (!userId) return null; return { key: userId, text: r.DisplayText, primaryText: r.DisplayText, secondaryText: (r.EntityData && r.EntityData.Email) ? r.EntityData.Email : (r.Description || r.EntityType), imageInitials: r.DisplayText ? r.DisplayText.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : '?' } as IPersonaProps; })); return suggestions.filter((s): s is IPersonaProps => s !== null); } catch (e: any) { console.error("People Picker Error:", e); return []; } }} pickerSuggestionsProps={{ suggestionsHeaderText: 'People & Groups', noResultsFoundText: 'No results found', loadingText: 'Loading' }} itemLimit={isUserMulti ? undefined : 1} selectedItems={selectedPersonas} onChange={(items?: IPersonaProps[]) => { const currentItems = items || []; const newIds = currentItems.map(i => parseInt((i.key as string) ?? "0")); const newOptions = { ...this.state.peopleOptions }; currentItems.forEach(i => { const userId = parseInt((i.key as string) ?? "0"); if (userId) newOptions[userId] = i as any; }); this.setState({ peopleOptions: newOptions }); this.handleChange(key, isUserMulti ? newIds : (newIds[0] || null)); }} />
+                <NormalPeoplePicker 
+                  onResolveSuggestions={this._resolvePeopleSuggestions} 
+                  pickerSuggestionsProps={{ suggestionsHeaderText: 'People & Groups', noResultsFoundText: 'No results found', loadingText: 'Loading' }} 
+                  itemLimit={isUserMulti ? undefined : 1} 
+                  selectedItems={selectedPersonas} 
+                  onChange={(items?: IPersonaProps[]) => { 
+                    const currentItems = items || []; 
+                    const newIds = currentItems.map(i => parseInt((i.key as string) ?? "0")); 
+                    const newOptions = { ...this.state.peopleOptions }; 
+                    currentItems.forEach(i => { 
+                      const userId = parseInt((i.key as string) ?? "0"); 
+                      if (userId) newOptions[userId] = i as any; 
+                    }); 
+                    this.setState({ peopleOptions: newOptions }); 
+                    this.handleChange(key, isUserMulti ? newIds : (newIds[0] || null)); 
+                  }} 
+                />
               </div>
               {error && !effectiveReadOnly && <span style={{ color: 'red', fontSize: 12 }}>{error}</span>}
             </div>
           );
         }
+
         case 'Attachments': {
           return (
             <div key={key} className={styles.field} title={isRestricted ? restrictionMessage : ""}>
@@ -4131,7 +4148,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
               );
             }
 
-            const fDef = fields.filter((f: any) => f.InternalName === fName)[0];
+            const fDef = fields.find((f: any) => f.InternalName === fName);
             const raw = item[fName];
             let val: any = '';
 
@@ -4389,7 +4406,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
                     </th>
                     {listCols.map((fName, idx) => {
                       if (fName === 'ContentType' || fName === 'ContentTypeId') return null;
-                      const fDef = fields.filter(f => f.InternalName === fName)[0];
+                      const fDef = fields.find(f => f.InternalName === fName);
                       const title = fDef ? fDef.Title : fName;
                       const isFilterEnabled = hasCustomFilters ? filterConfig[fName] === true : true;
                       const rawFilter = filters[fName];

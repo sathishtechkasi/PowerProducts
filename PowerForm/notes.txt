@@ -20,3 +20,6 @@ heft package-solution --production
 
 TODO
 Check all code upto latest and api
+
+export NODE_OPTIONS=--max_old_space_size=8192
+heft build package-solution --production
