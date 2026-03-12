@@ -424,7 +424,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         const config = this.getNotificationConfig();
         const listName = this.props.listPageTitle || this.props.selectedList;
 
-        await void NotificationService.logNotification(
+        await NotificationService.logNotification(
           this.service.siteUrl,
           listName,
           'Viewed',
@@ -583,7 +583,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         this.executeCustomScript(this.state.mode);
         //  If user clicks "Back" to go to List, but list is empty (because we deep-linked), load it now.
         if (this.state.mode === 'list' && this.state.items.length === 0) {
-          this.loadItems();
+          void this.loadItems();
         }
       }
       if (prevProps.isLargeList !== this.props.isLargeList) {
@@ -602,7 +602,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           loading: true
         }, () => {
           // Reload using the NEW mode (The loadItems method checks this.props.isLargeList)
-          this.loadItems('init');
+          void this.loadItems('init');
         });
       }
       if (JSON.stringify(prevProps.childConfigs) !== JSON.stringify(this.props.childConfigs)) {
@@ -1468,7 +1468,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
     const newPage = this.state.page + 1;
     this.setState({ page: newPage }, () => {
       //  Load with 'page' mode (Replaces items, uses NextHref)
-      this.loadItems_above5K('page');
+      void this.loadItems_above5K('page');
     });
   }
   private onPrevPage_Large = (): void => {
@@ -1485,7 +1485,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       });
     } else {
       // Fallback: If no cache, reset to start (Safest option for Large Lists)
-      this.setState({ page: 1 }, () => this.loadItems_above5K('init'));
+      this.setState({ page: 1 }, () => void this.loadItems_above5K('init'));
     }
   }
   private onPageSizeChange_Large = (newSize: number): void => {
@@ -1495,7 +1495,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
       pageCache: {}, // Clear cache as page chunks have changed
       nextPageUrl: undefined
     }, () => {
-      this.loadItems_above5K('init');
+      void this.loadItems_above5K('init');
     });
   }
 
@@ -2347,7 +2347,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
         filters: newFilters,
         page: 1
       }, () => {
-        this.loadItems('filter');
+        void this.loadItems('filter');
       });
     } catch (error: any) {
       void LoggerService.log(
@@ -3332,7 +3332,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           }
           // ==========================================
 
-          this.loadItems();
+          void this.loadItems();
         } catch (error: any) {
           void Swal.fire('Error!', 'Failed to delete item.', 'error');
           void LoggerService.log(
@@ -4243,11 +4243,11 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
           })}
           <td>
             <div className={styles.rowActions}>
-              <button className={styles.btn} title="View" onClick={() => { this.setState({ mode: 'view', itemId: item.Id }); this.loadItemData(item.Id); }}>
+              <button className={styles.btn} title="View" onClick={() => { this.setState({ mode: 'view', itemId: item.Id }); void this.loadItemData(item.Id); }}>
                 <Icons.View />
               </button>
               {this.state.canEdit && !this.props.overrideEdit && (
-                <button className={styles.btn} title="Edit" onClick={() => { this.setState({ mode: 'edit', itemId: item.Id }); this.loadItemData(item.Id); }}>
+                <button className={styles.btn} title="Edit" onClick={() => { this.setState({ mode: 'edit', itemId: item.Id }); void this.loadItemData(item.Id); }}>
                   <Icons.Edit />
                 </button>
               )}
@@ -4335,11 +4335,11 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
                   </button>
                 )}
                 {this.state.selectedItems.length === 1 && (
-                  <button className={styles.btn} title="View" onClick={() => { this.setState({ mode: 'view', itemId: this.state.selectedItems[0] }); this.loadItemData(this.state.selectedItems[0]); }}><Icons.View /></button>
+                  <button className={styles.btn} title="View" onClick={() => { this.setState({ mode: 'view', itemId: this.state.selectedItems[0] }); void this.loadItemData(this.state.selectedItems[0]); }}><Icons.View /></button>
                 )}
 
                 {this.state.selectedItems.length === 1 && this.state.canEdit && !this.props.overrideEdit && (
-                  <button className={styles.btn} title="Edit" onClick={() => { this.setState({ mode: 'edit', itemId: this.state.selectedItems[0] }); this.loadItemData(this.state.selectedItems[0]); }}><Icons.Edit /></button>
+                  <button className={styles.btn} title="Edit" onClick={() => { this.setState({ mode: 'edit', itemId: this.state.selectedItems[0] }); void this.loadItemData(this.state.selectedItems[0]); }}><Icons.Edit /></button>
                 )}
 
                 {/*  HIDE ADD BUTTON IF NO PERMISSION */}
@@ -4546,7 +4546,7 @@ export default class PowerForm extends React.Component<IPowerFormProps, IPowerFo
                         //  Show Loading
                         this.setState({ loading: true });
                         //  Reload Data
-                        this.loadItemData(this.state.itemId)
+                        void this.loadItemData(this.state.itemId)
                           .then(() => {
                             //  Re-Apply URL Params (Optional: if you want URL params to override again)
                             if (mode === 'edit') this.applyUrlParameters();
