@@ -1,5 +1,5 @@
 
- import * as React from 'react';
+import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import Swal from 'sweetalert2';
 import { spfi, SPFx, SPFI } from "@pnp/sp";
@@ -79,10 +79,10 @@ const Icons = {
  * Used for cloning Field Order maps.
  */
 function cloneMap(source: { [key: string]: number } | undefined): { [key: string]: number } {
-  var dest: { [key: string]: number } = {};
+  let dest: { [key: string]: number } = {};
   if (!source) { return dest; }
-  for (var k in source) {
-    if (source.hasOwnProperty(k)) { dest[k] = source[k]; }
+  for (let k in source) {
+    if (Object.prototype.hasOwnProperty.call(source, k)) { dest[k] = source[k]; }
   }
   return dest;
 }
@@ -90,16 +90,17 @@ function cloneMap(source: { [key: string]: number } | undefined): { [key: string
  * Essential for immutability when updating React/SPFx state.
  */
 function cloneConfig(source: IValidationConfig | undefined): IValidationConfig {
-  var dest: IValidationConfig = {};
+  let dest: IValidationConfig = {};
   if (!source) { return dest; }
-  for (var f in source) {
-    if (source.hasOwnProperty(f)) { dest[f] = source[f]; }
+  for (let f in source) {
+    if (Object.prototype.hasOwnProperty.call(source, f)) { dest[f] = source[f]; }
   }
   return dest;
 }
+
 /** ES5-friendly Set→Array helper */
 function setToArray(s: Set<any>): string[] {
-  var out: string[] = [];
+  let out: string[] = [];
   s.forEach(function (v) { out.push(v); });
   return out;
 }
@@ -176,6 +177,98 @@ export interface INotificationRule {
   message: string;
   targetGroups: number[];
 }
+
+
+// --- HELPER COMPONENT: CheckboxListEditor ---
+// An alternative to MultiSelect, renders checkboxes in a scrollable div.
+// Supports a max selection limit.
+class CheckboxListEditor extends React.Component<{
+  label: string;
+  options: { key: string; text: string }[];
+  selectedKeys: string[];
+  onChanged: (keys: string[]) => void;
+  maxSelection?: number; // Optional limit
+}, { selectedKeys: string[] }> {
+  constructor(props: any) {
+    super(props);
+    try {
+      this.state = { selectedKeys: props.selectedKeys || [] };
+    } catch (error: any) {
+      void LoggerService.log('CheckboxListEditor-constructor', 'High', 'Config', error.message || JSON.stringify(error));
+    }
+  }
+  public componentWillReceiveProps(nextProps: any) {
+    try {
+      if (JSON.stringify(nextProps.selectedKeys) !== JSON.stringify(this.state.selectedKeys)) {
+        this.setState({ selectedKeys: nextProps.selectedKeys || [] });
+      }
+    } catch (error: any) {
+      void LoggerService.log('CheckboxListEditor-willReceiveProps', 'Low', 'Config', error.message || JSON.stringify(error));
+    }
+  }
+  private toggleKey = (key: string) => {
+    try {
+      const current = [...this.state.selectedKeys];
+      const idx = current.indexOf(key);
+      if (idx > -1) {
+        // Uncheck is always allowed
+        current.splice(idx, 1);
+      } else {
+        // Check Limit before adding
+        if (this.props.maxSelection && current.length >= this.props.maxSelection) {
+          void Swal.fire({ icon: 'warning', title: 'warning', text: `You can only select up to ${this.props.maxSelection} columns.` });
+          return;
+        }
+        current.push(key);
+      }
+      this.setState({ selectedKeys: current });
+      this.props.onChanged(current);
+    } catch (error: any) {
+      void LoggerService.log('CheckboxListEditor-toggleKey', 'Medium', 'Config', error.message || JSON.stringify(error));
+    }
+  };
+  public render() {
+    return React.createElement('div', { style: { marginTop: 8 } },
+      React.createElement('label', { style: { fontWeight: 600, display: 'block', marginBottom: 8 } }, this.props.label),
+      // Scrollable Container
+      React.createElement('div', {
+        style: {
+          maxHeight: '200px',
+          overflowY: 'auto',
+          border: '1px solid #e1dfdd',
+          padding: '5px',
+          background: '#ffffff'
+        }
+      },
+        this.props.options.map((opt: any) => {
+          const isChecked = this.state.selectedKeys.indexOf(opt.key) > -1;
+          const isDisabled = !isChecked && this.props.maxSelection && this.state.selectedKeys.length >= this.props.maxSelection;
+          return React.createElement('div', {
+            key: opt.key,
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: 6,
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
+              opacity: isDisabled ? 0.6 : 1
+            },
+            onClick: () => !isDisabled && this.toggleKey(opt.key)
+          },
+            React.createElement('input', {
+              type: 'checkbox',
+              checked: isChecked,
+              disabled: isDisabled,
+              onChange: () => { },
+              style: { marginRight: 8, cursor: isDisabled ? 'not-allowed' : 'pointer' }
+            }),
+            React.createElement('span', null, opt.text)
+          );
+        })
+      )
+    );
+  }
+}
+
 
 export class NotificationRuleEditor extends React.Component<{
   label: string;
@@ -456,95 +549,6 @@ class MultiSelectEditor extends React.Component<IMultiSelectEditorProps, { selec
     });
   }
 }
-// --- HELPER COMPONENT: CheckboxListEditor ---
-// An alternative to MultiSelect, renders checkboxes in a scrollable div.
-// Supports a max selection limit.
-class CheckboxListEditor extends React.Component<{
-  label: string;
-  options: { key: string; text: string }[];
-  selectedKeys: string[];
-  onChanged: (keys: string[]) => void;
-  maxSelection?: number; // Optional limit
-}, { selectedKeys: string[] }> {
-  constructor(props: any) {
-    super(props);
-    try {
-      this.state = { selectedKeys: props.selectedKeys || [] };
-    } catch (error: any) {
-      void LoggerService.log('CheckboxListEditor-constructor', 'High', 'Config', error.message || JSON.stringify(error));
-    }
-  }
-  public componentWillReceiveProps(nextProps: any) {
-    try {
-      if (JSON.stringify(nextProps.selectedKeys) !== JSON.stringify(this.state.selectedKeys)) {
-        this.setState({ selectedKeys: nextProps.selectedKeys || [] });
-      }
-    } catch (error: any) {
-      void LoggerService.log('CheckboxListEditor-willReceiveProps', 'Low', 'Config', error.message || JSON.stringify(error));
-    }
-  }
-  private toggleKey = (key: string) => {
-    try {
-      const current = [...this.state.selectedKeys];
-      const idx = current.indexOf(key);
-      if (idx > -1) {
-        // Uncheck is always allowed
-        current.splice(idx, 1);
-      } else {
-        // Check Limit before adding
-        if (this.props.maxSelection && current.length >= this.props.maxSelection) {
-          void Swal.fire({ icon: 'warning', title: 'warning', text: `You can only select up to ${this.props.maxSelection} columns.` });
-          return;
-        }
-        current.push(key);
-      }
-      this.setState({ selectedKeys: current });
-      this.props.onChanged(current);
-    } catch (error: any) {
-      void LoggerService.log('CheckboxListEditor-toggleKey', 'Medium', 'Config', error.message || JSON.stringify(error));
-    }
-  };
-  public render() {
-    return React.createElement('div', { style: { marginTop: 8 } },
-      React.createElement('label', { style: { fontWeight: 600, display: 'block', marginBottom: 8 } }, this.props.label),
-      // Scrollable Container
-      React.createElement('div', {
-        style: {
-          maxHeight: '200px',
-          overflowY: 'auto',
-          border: '1px solid #e1dfdd',
-          padding: '5px',
-          background: '#ffffff'
-        }
-      },
-        this.props.options.map((opt: any) => {
-          const isChecked = this.state.selectedKeys.indexOf(opt.key) > -1;
-          const isDisabled = !isChecked && this.props.maxSelection && this.state.selectedKeys.length >= this.props.maxSelection;
-          return React.createElement('div', {
-            key: opt.key,
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              marginBottom: 6,
-              cursor: isDisabled ? 'not-allowed' : 'pointer',
-              opacity: isDisabled ? 0.6 : 1
-            },
-            onClick: () => !isDisabled && this.toggleKey(opt.key)
-          },
-            React.createElement('input', {
-              type: 'checkbox',
-              checked: isChecked,
-              disabled: isDisabled,
-              onChange: () => { },
-              style: { marginRight: 8, cursor: isDisabled ? 'not-allowed' : 'pointer' }
-            }),
-            React.createElement('span', null, opt.text)
-          );
-        })
-      )
-    );
-  }
-}
 // --- HELPER COMPONENT: ColumnMappingEditor ---
 // UI for mapping Source Columns -> Target Fields (e.g. for Auto-populate)
 export class ColumnMappingEditor extends React.Component<{
@@ -813,13 +817,13 @@ export default class PowerFormWebPart extends BaseClientSideWebPart<IPowerFormWe
 
       this.detectedIsLargeList = count >= 5000;
       // 2. GET FIELDS
-      var url = this.context.pageContext.web.absoluteUrl +
+      let url = this.context.pageContext.web.absoluteUrl +
         "/_api/web/lists/getbytitle('" + listTitle + "')/fields?" +
         "$filter=Hidden eq false and (ReadOnlyField eq false or InternalName eq 'Attachments' or InternalName eq 'Created' or InternalName eq 'Modified' or InternalName eq 'Author' or InternalName eq 'Editor')" +
         "&$select=InternalName,Title,TypeAsString,Choices,ReadOnlyField,Required";
-      var res = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      var data: any = await res.json();
-      var arr = data.value || [];
+      let res = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
+      let data: any = await res.json();
+      let arr = data.value || [];
       this.fields = arr.filter(function (f: any) { return f && f.InternalName; })
         .map(function (f: any) {
           return { key: f.InternalName, text: f.Title || f.InternalName, type: f.TypeAsString, choices: f.Choices || [], Required: f.Required };
@@ -886,8 +890,8 @@ export default class PowerFormWebPart extends BaseClientSideWebPart<IPowerFormWe
       const endpoint = `${this.context.pageContext.web.absoluteUrl}/_api/web/lists?$filter=${filterQuery}&$select=Title,Id`;
       const res = await this.context.spHttpClient.get(endpoint, SPHttpClient.configurations.v1);
 
-      var data: any = await res.json();
-      var arr = data.value || [];
+      let data: any = await res.json();
+      let arr = data.value || [];
       this.lists = arr.map(function (l: any) {
         return { key: l.Title || String(l.Id), text: l.Title || String(l.Id) };
       });
@@ -987,7 +991,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
         this.context.propertyPane.refresh();
       }
       if (this.siteGroups.length === 0) {
-        this.context.spHttpClient.get(
+        void this.context.spHttpClient.get(
           `${this.context.pageContext.web.absoluteUrl}/_api/web/sitegroups?$select=Id,Title`,
           SPHttpClient.configurations.v1
         )
@@ -1017,7 +1021,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
         // Clear current selection if it might disappear
         this.properties.selectedList = '';
         // Reload lists with new filter
-        this.loadLists();
+        void this.loadLists();
       }
       if (path === 'selectedList' && oldVal !== newVal) {
         await this.loadFieldsForSelectedList(newVal);
@@ -1554,7 +1558,11 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
             // Toggle Visibility Handler - Using Arrow Function to fix 'this' context
             const onToggle = (k: string, t: string, chk: boolean) => {
               const s = new Set((this.properties as any)[props.vis] || []);
-              chk ? s.add(k) : s.delete(k);
+              if (chk) {
+                s.add(k);
+              } else {
+                s.delete(k);
+              }
               (this.properties as any)[props.vis] = setToArray(s);
               this.context.propertyPane.refresh();
             };
@@ -2078,7 +2086,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
                 onChanged: (newKeys: string[]) => {
                   if (this.properties.cascadeConfig && this.properties.cascadeConfig[field.key]) {
                     this.properties.cascadeConfig[field.key].additionalFields = newKeys;
-                    
+
                   }
                   this.render();
                 }
@@ -2098,7 +2106,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
                 mappings: currentMap,
                 onChanged: (newMap: IColumnMapping[]) => {
                   if (this.properties.cascadeConfig && this.properties.cascadeConfig[field.key]) {
-                 
+
                     this.properties.cascadeConfig[field.key].columnMapping = newMap;
                   }
                   this.render();
@@ -2282,13 +2290,13 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
             this.render();
             // If the list changed, we might want to reload fields
             if (importedConfig.selectedList) {
-              this.loadFieldsForSelectedList(importedConfig.selectedList).then(() => {
+              void this.loadFieldsForSelectedList(importedConfig.selectedList).then(() => {
                 this.context.propertyPane.refresh();
               });
             }
             void Swal.fire({ icon: 'success', title: 'success', text: "Configuration imported successfully!" });
           }
-        } catch (err:any) {
+        } catch (err: any) {
           void LoggerService.log('PowerFormWebPart-handleImportFile-Parser', 'High', 'Config', err.message || JSON.stringify(err));
           void Swal.fire('Error!', 'Error parsing JSON file.');
         }
@@ -2501,7 +2509,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
     try {
       // 1. DETERMINE STATE
       const isFirstTime = !this.properties.isLogSetupConfirmed;
-      var maxOrder = this.fields.filter(f => f.key !== 'ContentType').length;
+      let maxOrder = this.fields.filter(f => f.key !== 'ContentType').length;
       // ==============================================================================
       // PAGE 1: MANDATORY LOGGING SETUP (From getPropertyPaneConfiguration)
       // ==============================================================================
@@ -2543,18 +2551,18 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
       // HELPER: FIELD GROUPS GENERATOR (From getPropertyPaneConfiguration)
       // ==============================================================================
       const getGroup = (type: 'add' | 'edit' | 'view' | 'list', title: string) => {
-        var fields: IPropertyPaneField<IPropertyPaneCustomFieldProps>[] = [];
+        let fields: IPropertyPaneField<IPropertyPaneCustomFieldProps>[] = [];
         // 1. ADD SELECT ALL BUTTON
         fields.push(this.getSelectAllControl(type));
         // 2. ADD FIELDS
-        for (var i = 0; i < this.fields.length; i++) {
+        for (let i = 0; i < this.fields.length; i++) {
           const f = this.fields[i];
           if (f.key === 'ContentType') continue;
           const isSystemAuditField = ['Created', 'Author', 'Modified', 'Editor'].indexOf(f.key) > -1;
           if (type !== 'list' && isSystemAuditField) {
             continue;
           }
-          var ctrls = this.getFieldControl(f, maxOrder, type);
+          let ctrls = this.getFieldControl(f, maxOrder, type);
           fields.push(...ctrls);
         }
         // 3. ADD MODE SPECIFIC BUTTONS
