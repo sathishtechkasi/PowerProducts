@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "powerform-client-side-solution",
-    "id": "9a9cc573-d821-4c04-ac4b-b762365a737a",
-    "version": "1.0.0.2",
+    "name": "power-data-sync-client-side-solution",
+    "id": "6504a6e7-19c3-48db-a25b-be4ea36119c7",
+    "version": "1.0.0.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -16,10 +16,10 @@
     },
     "metadata": {
       "shortDescription": {
-        "default": "Powerform description"
+        "default": "PowerDataSync description"
       },
       "longDescription": {
-        "default": "Powerform description"
+        "default": "PowerDataSync description"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -27,14 +27,14 @@
     },
     "features": [
       {
-        "title": "M365 Power Products - PowerForm Feature",
-        "description": "This feature will activate the PowerForm Features",
-        "id": "74236e1d-33b6-48e8-a446-264880268e36",
+        "title": "power-data-sync Feature",
+        "description": "The feature that activates elements of the power-data-sync solution.",
+        "id": "5626ee1c-f00e-41b0-870d-432928e82a37",
         "version": "1.0.0.0"
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/powerform.sppkg"
+    "zippedPackage": "solution/power-data-sync.sppkg"
   }
 }

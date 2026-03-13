@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "power-data-sync-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/powerDataSync/PowerDataSyncWebPart.js",
+          "manifest": "./src/webparts/powerDataSync/PowerDataSyncWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "PowerDataSyncWebPartStrings": "lib/webparts/powerDataSync/loc/{locale}.js"
+  }
+}

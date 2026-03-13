@@ -1,10 +1,16 @@
 # =====================================================================
 # PowerForm Demo Provisioning Script (With Feature Descriptions)
 # =====================================================================
-$SiteUrl = "https://m365powerproducts.sharepoint.com/sites/poweformdemo
+$SiteUrl = "https://m365powerproducts.sharepoint.com/sites/powerformdemo"
+
+Write-Host "Checking for PnP.PowerShell..." -ForegroundColor Gray
+if (-not (Get-Module -ListAvailable PnP.PowerShell)) {
+    Write-Host "Installing PnP.PowerShell module..." -ForegroundColor Yellow
+    Install-Module -Name PnP.PowerShell -Scope CurrentUser -Force
+}
 
 # Connect to SharePoint
-Connect-PnPOnline -Url $SiteUrl -Interactive
+Connect-PnPOnline -Url $SiteUrl -DeviceLogin
 
 Write-Host "Creating Supporting Lists..." -ForegroundColor Cyan
 

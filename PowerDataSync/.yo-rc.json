@@ -1,0 +1,19 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "useGulp": false,
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.22.1",
+    "sdksVersions": {},
+    "version": "1.22.2",
+    "libraryName": "power-data-sync",
+    "libraryId": "6504a6e7-19c3-48db-a25b-be4ea36119c7",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "PowerDataSync",
+    "solutionShortDescription": "PowerDataSync description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

@@ -1,0 +1,26 @@
+docker compose down
+docker compose build --no-cache
+docker compose run --rm spfxdatasync
+
+yo @microsoft/sharepoint
+
+
+whoami
+echo $HOME
+node --version
+npm --version
+yo --version
+
+npx tsc --noEmit
+
+heft clean
+heft build --production
+heft package-solution --production
+
+npm run build:prod
+
+TODO
+Check all code upto latest and api
+
+export NODE_OPTIONS=--max_old_space_size=8192
+heft build package-solution --production

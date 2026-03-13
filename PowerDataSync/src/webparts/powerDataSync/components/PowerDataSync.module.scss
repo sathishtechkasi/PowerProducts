@@ -1,0 +1,447 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+
+:global {
+  // Fix SPFx width constraints
+  .CanvasZone, .CanvasSection-col, .ControlZone {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+/* ===== Main Container ===== */
+.powerDataSyncContainer {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+  color: #323130;
+}
+
+/* ===== Form Groups ===== */
+.formGroup {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #323130;
+    font-size: 14px;
+  }
+
+  /* Modern Input Styles */
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 0 12px;
+    height: 36px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    font-size: 14px;
+    background: #fff;
+    transition: all 0.2s;
+    box-sizing: border-box;
+
+    &:hover {
+      border-color: #323130;
+    }
+    &:focus {
+      border-color: #0078d4;
+      outline: 1px solid #0078d4;
+    }
+  }
+}
+
+/* Custom File Upload Zone */
+input[type="file"] {
+  border: 1px dashed #8a8886;
+  background: #f3f2f1;
+  padding: 20px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-sizing: border-box;
+
+  &:hover {
+    background: #edebe9;
+    border-color: #0078d4;
+  }
+}
+
+/* ===== Buttons (Fluent UI Style) ===== */
+.importButton {
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  height: 32px;
+  padding: 0 20px;
+  min-width: 80px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #106ebe;
+  }
+  &:active {
+    background: #005a9e;
+  }
+  &:disabled {
+    background: #f3f2f1;
+    color: #a19f9d;
+    cursor: default;
+  }
+}
+
+/* Link Button */
+.linkButton {
+  background: transparent;
+  color: #0078d4;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f2f1;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    color: #a19f9d;
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+}
+
+/* ===== Wizard Stepper ===== */
+.wizard {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #edebe9;
+}
+
+.wizardStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  flex: 1;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  /* Modern Connector Line */
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: #edebe9;
+    z-index: 0;
+  }
+}
+
+/* Restored: Used by TSX for legacy layout, hidden visually as ::after handles it now */
+.wizardSeparator {
+  display: none;
+}
+
+.wizardIndex {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #8a8886;
+  color: #605e5c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.wizardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #605e5c;
+  text-align: center;
+}
+
+/* Active Step */
+.wizardStepActive {
+  opacity: 1;
+
+  .wizardIndex {
+    border-color: #0078d4;
+    background: #0078d4;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.2);
+  }
+
+  .wizardTitle {
+    color: #0078d4;
+  }
+}
+
+/* Completed Step */
+.wizardStepDone {
+  opacity: 1;
+
+  .wizardIndex {
+    border-color: #107c10;
+    background: #107c10;
+    color: #fff;
+  }
+
+  .wizardTitle {
+    color: #107c10;
+  }
+
+  &:not(:last-child)::after {
+    background: #107c10;
+  }
+}
+
+/* ===== Mapping Table (Step 2) ===== */
+.mappingTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #edebe9;
+  border-radius: 4px;
+  overflow: hidden;
+
+  th {
+    background: #f3f2f1;
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: #323130;
+    border-bottom: 1px solid #edebe9;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #edebe9;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background-color: #faf9f8;
+  }
+}
+
+.requiredRow {
+  background-color: #fff4ce;
+  tr:hover td {
+    background-color: #fff0bb !important;
+  }
+}
+
+/* Unique Badge */
+.uniqueBadge {
+  display: inline-block;
+  background: #0078d4;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Restored Table Classes */
+.colNameCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldSelectCell {
+  /* Inherits default td styles */
+}
+
+/* ===== Validation & Preview (Step 4) ===== */
+.validationSummary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: #fff;
+  border: 1px solid #e1dfdd;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #323130;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.validationList {
+  background: #fdf3f4;
+  border: 1px solid #fde7e9;
+  padding: 12px;
+  border-radius: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+
+  li {
+    color: #a4262c;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+}
+
+.previewTableWrapper {
+  border: 1px solid #edebe9;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.previewTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #f3f2f1;
+    padding: 8px 12px;
+    font-size: 12px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-top: 1px solid #edebe9;
+  }
+}
+
+/* ===== Loading State ===== */
+.progressBarContainer {
+  margin: 16px 0;
+}
+
+.progressBar {
+  height: 6px;
+  background: #edebe9;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: #0078d4;
+  transition: width 0.3s ease-out;
+}
+
+.progressText {
+  font-size: 13px;
+  color: #605e5c;
+  text-align: right;
+}
+
+/* ===== Helper Classes ===== */
+.errorText {
+  color: #a4262c;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.successText {
+  margin-top: 8px;
+  color: #107c10;
+  font-size: 13px;
+  padding: 8px;
+  background: #dff6dd;
+  border: 1px solid #107c10;
+  border-radius: 4px;
+}
+
+.muted {
+  color: #605e5c;
+  font-size: 12px;
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0 16px 0;
+}
+
+/* --- FIX FOR EXTRA LINE --- */
+/* The last step (Step 5) is actually the 2nd-to-last child 
+   because the "Return to Dashboard" icon is the very last child. */
+.wizardStep:nth-last-child(2)::after {
+  display: none !important;
+}
+
+:global {
+  /* Force full width for the web part container */
+  .CanvasZone,
+  .CanvasSection-col,
+  .ControlZone,
+  [data-automation-id="CanvasControl"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Remove default column padding */
+  .CanvasSection-col>div {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Hide the default Page Title area to reclaim space */
+  .pageTitle_dececfca,
+  div[class*="pageTitle_"] {
+    display: none !important;
+  }
+
+  /* Apply negative margin to the canvas wrapper to remove whitespace */
+  div[data-automation-id="CanvasControl"],
+  .CanvasZone {
+    margin-top: -29px !important;
+  }
+
+  /* Target specific SharePoint wrapper class if present */
+  .canvasWrapper {
+    margin-top: -29px !important;
+  }
+}
