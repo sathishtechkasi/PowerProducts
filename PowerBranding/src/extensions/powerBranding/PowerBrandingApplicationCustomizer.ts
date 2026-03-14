@@ -29,7 +29,7 @@ export default class PowerBrandingApplicationCustomizer
 
   public async onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
-  
+
     // 1. Show Loader Immediately from Cache
     this.checkAndApplyCachedLoader();
 
@@ -144,9 +144,9 @@ export default class PowerBrandingApplicationCustomizer
       styleElement.innerHTML = cssString;
     }
   }
-
   private executeScript(scriptContent: string): void {
     try {
+      // eslint-disable-next-line no-new-func
       const dynamicFunction = new Function('context', scriptContent);
       dynamicFunction(this.context);
     } catch (e) {
