@@ -50,15 +50,17 @@
             border-bottom: 3px solid var(--sp-blue);
         }
 
-        .logo-area h1 {
-            color: var(--sp-blue);
-            margin: 0;
-            font-size: 2.5rem;
+        .logo-area {
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        .logo-area span {
-            color: var(--sp-orange);
+        .logo-area img {
+            max-height: 80px;
+            margin-bottom: 10px;
         }
 
         .tagline {
@@ -98,22 +100,16 @@
 
         /* Hero Banner */
         .hero-banner {
-            background: linear-gradient(135deg, var(--sp-blue) 0%, #0078d4 100%);
-            color: white;
-            padding: 3rem;
-            border-radius: 8px;
             text-align: center;
             margin-bottom: 3rem;
         }
 
-        .reduction-badge {
-            display: inline-block;
-            background: var(--sp-orange);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-top: 15px;
+        .hero-banner img {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
         }
 
         /* Grid */
@@ -136,9 +132,49 @@
             transform: translateY(-5px);
         }
 
+        /* --- PURE CSS ICONS IMPLEMENTATION --- */
         .product-card h3 {
             color: var(--sp-blue);
             margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-card h3::before {
+            content: '';
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        /* Form Icon */
+        .card-form h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/%3E%3C/svg%3E"); 
+        }
+        /* Sync Icon */
+        .card-sync h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z'/%3E%3C/svg%3E"); 
+        }
+        /* Branding Icon */
+        .card-branding h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E"); 
+        }
+        /* Ops Icon */
+        .card-ops h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z'/%3E%3C/svg%3E"); 
+        }
+        /* Dashboard Icon */
+        .card-dashboard h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'/%3E%3C/svg%3E"); 
+        }
+        /* Report Icon */
+        .card-report h3::before { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f35b1c'%3E%3Cpath d='M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z'/%3E%3C/svg%3E"); 
         }
 
         /* Buttons */
@@ -174,7 +210,6 @@
             font-size: 2.2rem;
         }
 
-        /* Responsive Image Placeholder Fix */
         .product-image-placeholder {
             width: 100%;
             height: 400px;
@@ -271,7 +306,7 @@
 
     <header>
         <div class="logo-area" onclick="showPage('home')">
-            <h1>SharePoint <span>Power</span> Products</h1>
+            <img src="./img/logo.png" alt="SharePoint Power Products Logo">
             <p class="tagline">Reducing Development Time By 80% | From Code to Configuration</p>
         </div>
     </header>
@@ -280,43 +315,41 @@
 
         <section id="home" class="page-section">
             <div class="hero-banner">
-                <h2>Accelerate Your SharePoint Development</h2>
-                <p>Stop writing repetitive code. Switch to high-speed configuration with our suite of power tools.</p>
-                <div class="reduction-badge">80% Reduction in Dev Time</div>
+                <img src="./img/PowerTheme.png" alt="80% Reduction - From Development to Configuration">
             </div>
 
             <div class="product-grid">
-                <div class="product-card">
+                <div class="product-card card-form">
                     <h3>SharePoint Power Form</h3>
                     <p>Create complex, responsive forms with advanced logic without writing a single line of JavaScript.</p>
                     <button class="btn" onclick="showPage('product-form')">Learn More</button>
                 </div>
 
-                <div class="product-card">
+                <div class="product-card card-sync">
                     <h3>SharePoint Power Data Synchronizer</h3>
                     <p>Seamlessly sync data between SharePoint lists, libraries, and external SQL databases with ease.</p>
                     <button class="btn" onclick="showPage('product-sync')">Learn More</button>
                 </div>
 
-                <div class="product-card">
+                <div class="product-card card-branding">
                     <h3>SharePoint Power Branding</h3>
                     <p>Instantly apply corporate themes and custom layouts across your entire tenant with configuration sliders.</p>
                     <button class="btn" onclick="showPage('product-branding')">Learn More</button>
                 </div>
 
-                <div class="product-card">
+                <div class="product-card card-ops">
                     <h3>SharePoint PowerOps</h3>
                     <p>Configure powerful workflows and schedule cron-based jobs with an enhanced visual experience.</p>
                     <button class="btn" onclick="showPage('product-ops')">Learn More</button>
                 </div>
 
-                <div class="product-card">
+                <div class="product-card card-dashboard">
                     <h3>SharePoint Power Dashboard</h3>
                     <p>Beautiful, real-time executive dashboards that aggregate data from multiple site collections.</p>
                     <button class="btn" onclick="showPage('product-dashboard')">Learn More</button>
                 </div>
 
-                <div class="product-card">
+                <div class="product-card card-report">
                     <h3>SharePoint Power Report Builder</h3>
                     <p>Drag-and-drop report generation. Export professional PDF and Excel reports directly from SharePoint.</p>
                     <button class="btn" onclick="showPage('product-report')">Learn More</button>
