@@ -42,31 +42,77 @@
             color: var(--sp-orange);
         }
 
-        /* Header */
+         /* Header Layout Updates */
         header {
             background-color: white;
-            padding: 2rem 1rem;
-            text-align: center;
+            padding: 1.5rem 2rem;
             border-bottom: 3px solid var(--sp-blue);
         }
 
-        .logo-area {
-            cursor: pointer;
+        .header-content {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .logo-area img {
-            max-height: 80px;
-            margin-bottom: 10px;
+        .logo-container {
+            position: absolute;
+            left: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
         }
 
+        /* TWEAK LOGO SIZE HERE */
+        .logo-container img {
+            max-height: 85px; /* Increased slightly from 70px for better visibility */
+            width: auto;
+        }
+
+        .title-container {
+            text-align: center;
+            cursor: pointer;
+            /* Added margin to ensure text doesn't overlap the logo on medium screens */
+            padding: 0 120px; 
+        }
+
+        /* TWEAK TITLE SIZE HERE */
+        .site-title {
+            margin: 0;
+            /* Using clamp to automatically resize text: min size, preferred size, max size */
+            font-size: clamp(1.8rem, 4vw, 2.6rem); 
+            color: var(--sp-blue);
+            line-height: 1.2;
+        }
+
+        .site-title .power-text {
+            color: var(--sp-orange);
+        }
+
+        /* TWEAK TAGLINE SIZE HERE */
         .tagline {
             font-weight: 600;
-            color: var(--sp-blue);
-            margin-top: 10px;
+            color: var(--text-dark);
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 1.1rem; /* Slightly larger for readability */
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 850px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .logo-container {
+                position: relative;
+                margin-bottom: 20px;
+            }
+            .title-container {
+                padding: 0;
+            }
         }
 
         /* Containers */
@@ -132,7 +178,7 @@
             transform: translateY(-5px);
         }
 
-        /* --- PURE CSS ICONS IMPLEMENTATION --- */
+        /* PURE CSS ICONS IMPLEMENTATION */
         .product-card h3 {
             color: var(--sp-blue);
             margin-top: 0;
@@ -288,6 +334,16 @@
             margin-top: 4rem;
         }
 
+        @media (max-width: 800px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .logo-container {
+                position: relative;
+                margin-bottom: 15px;
+            }
+        }
+
         @media (max-width: 600px) {
             .product-image-placeholder {
                 height: 250px;
@@ -305,9 +361,14 @@
     </nav>
 
     <header>
-        <div class="logo-area" onclick="showPage('home')">
-            <img src="./img/logo.png" alt="SharePoint Power Products Logo">
-            <p class="tagline">Reducing Development Time By 80% | From Code to Configuration</p>
+        <div class="header-content">
+            <div class="logo-container" onclick="showPage('home')">
+                <img src="./img/logo.png" alt="SharePoint Power Products Logo">
+            </div>
+            <div class="title-container" onclick="showPage('home')">
+                <h1 class="site-title">SharePoint <span class="power-text">Power</span> Products</h1>
+                <p class="tagline">Reducing Development Time By 80% | From Code to Configuration</p>
+            </div>
         </div>
     </header>
 
