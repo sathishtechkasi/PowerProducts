@@ -75,7 +75,7 @@
             min-height: 50vh;
         }
 
-        /* Hide all pages by default except home */
+        /* Page Management */
         .page-section {
             display: none;
             animation: fadeIn 0.4s;
@@ -90,7 +90,6 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -142,6 +141,7 @@
             margin-top: 0;
         }
 
+        /* Buttons */
         .btn {
             display: inline-block;
             margin-top: 1rem;
@@ -163,7 +163,7 @@
             opacity: 0.9;
         }
 
-        /* Product Detail Pages */
+        /* Product Detail Styling */
         .product-detail-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -174,9 +174,10 @@
             font-size: 2.2rem;
         }
 
+        /* Responsive Image Placeholder Fix */
         .product-image-placeholder {
             width: 100%;
-            height: 300px;
+            height: 400px;
             background-color: #e1dfdd;
             border-radius: 8px;
             display: flex;
@@ -186,6 +187,14 @@
             font-weight: bold;
             margin-bottom: 2rem;
             border: 2px dashed #c8c6c4;
+            overflow: hidden;
+        }
+
+        .product-image-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .product-features {
@@ -193,6 +202,7 @@
             padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
         }
 
         .product-features ul {
@@ -212,7 +222,7 @@
             margin-right: 10px;
         }
 
-        /* About & Contact */
+        /* Content Cards */
         .content-card {
             background: white;
             padding: 3rem;
@@ -235,46 +245,18 @@
             margin: 2rem 0;
         }
 
-        /* Updated Placeholder Styles */
-        .product-image-placeholder {
-            width: 100%;
-            height: 300px;
-            background-color: #e1dfdd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #605e5c;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            border: 2px dashed #c8c6c4;
-            overflow: hidden;
-            /* Prevents image spillover */
-        }
-
-        /* New Responsive Image Rule */
-        .product-image-placeholder img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            /* Maintains aspect ratio while fitting inside */
-            display: block;
-        }
-
-        /* Mobile Responsiveness for the placeholder */
-        @media (max-width: 600px) {
-            .product-image-placeholder {
-                height: 200px;
-                /* Shrinks height on smaller screens */
-            }
-        }
-
         footer {
             text-align: center;
             padding: 3rem 1rem;
             background: #323130;
             color: white;
             margin-top: 4rem;
+        }
+
+        @media (max-width: 600px) {
+            .product-image-placeholder {
+                height: 250px;
+            }
         }
     </style>
 </head>
@@ -306,22 +288,19 @@
             <div class="product-grid">
                 <div class="product-card">
                     <h3>SharePoint Power Form</h3>
-                    <p>Create complex, responsive forms with advanced logic without writing a single line of JavaScript.
-                    </p>
+                    <p>Create complex, responsive forms with advanced logic without writing a single line of JavaScript.</p>
                     <button class="btn" onclick="showPage('product-form')">Learn More</button>
                 </div>
 
                 <div class="product-card">
                     <h3>SharePoint Power Data Synchronizer</h3>
-                    <p>Seamlessly sync data between SharePoint lists, libraries, and external SQL databases with ease.
-                    </p>
+                    <p>Seamlessly sync data between SharePoint lists, libraries, and external SQL databases with ease.</p>
                     <button class="btn" onclick="showPage('product-sync')">Learn More</button>
                 </div>
 
                 <div class="product-card">
                     <h3>SharePoint Power Branding</h3>
-                    <p>Instantly apply corporate themes and custom layouts across your entire tenant with configuration
-                        sliders.</p>
+                    <p>Instantly apply corporate themes and custom layouts across your entire tenant with configuration sliders.</p>
                     <button class="btn" onclick="showPage('product-branding')">Learn More</button>
                 </div>
 
@@ -339,8 +318,7 @@
 
                 <div class="product-card">
                     <h3>SharePoint Power Report Builder</h3>
-                    <p>Drag-and-drop report generation. Export professional PDF and Excel reports directly from
-                        SharePoint.</p>
+                    <p>Drag-and-drop report generation. Export professional PDF and Excel reports directly from SharePoint.</p>
                     <button class="btn" onclick="showPage('product-report')">Learn More</button>
                 </div>
             </div>
@@ -353,9 +331,8 @@
                 <p>Replace custom code with an intuitive configuration interface.</p>
             </div>
             <div class="product-image-placeholder">
-                <img src="./img/PowerForm.png" alt="SharePoint Power Form Explainer">
+                <img src="./img/PowerForm.png" alt="SharePoint Power Form">
             </div>
-
             <div class="product-features">
                 <h3>Key Features</h3>
                 <ul>
@@ -374,8 +351,7 @@
                 <p>Bridge the gap between your databases and SharePoint.</p>
             </div>
             <div class="product-image-placeholder">
-                <img src="./img/PowerDataSync.png" alt="SharePoint Power Data Synchronizer Explainer">
-
+                <img src="./img/PowerDataSync.png" alt="SharePoint Power Data Synchronizer">
             </div>
             <div class="product-features">
                 <h3>Key Features</h3>
@@ -395,109 +371,96 @@
                 <p>Enforce corporate identity effortlessly across your tenant.</p>
             </div>
             <div class="product-image-placeholder">
-                <img src="./img/PowerBranding.png" alt="SharePoint Power Branding Explainer">
+                <img src="./img/PowerBranding.png" alt="SharePoint Power Branding">
             </div>
-    </div>
-    <div class="product-features">
-        <h3>Key Features</h3>
-        <ul>
-            <li>Global CSS injection without Master Page customization</li>
-            <li>Header and footer injection across all site collections</li>
-            <li>Theme configuration sliders</li>
-            <li>One-click deployment to Hub Sites</li>
-        </ul>
-    </div>
-    </section>
+            <div class="product-features">
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Global CSS injection without Master Page customization</li>
+                    <li>Header and footer injection across all site collections</li>
+                    <li>Theme configuration sliders</li>
+                    <li>One-click deployment to Hub Sites</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="product-ops" class="page-section">
-        <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
-        <div class="product-detail-header">
-            <h2>SharePoint PowerOps</h2>
-            <p>Take control of your background processes and workflows.</p>
-        </div>
-        <div class="product-image-placeholder">
-            <img src="./img/PowerOps.png" alt="SharePoint PowerOps Explainer">
-        </div>
+        <section id="product-ops" class="page-section">
+            <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
+            <div class="product-detail-header">
+                <h2>SharePoint PowerOps</h2>
+                <p>Take control of your background processes and workflows.</p>
+            </div>
+            <div class="product-image-placeholder">
+                <img src="./img/PowerOps.png" alt="SharePoint PowerOps">
+            </div>
+            <div class="product-features">
+                <h3>Key Features</h3>
+                <ul>
+                    <li>True CRON job scheduling for SharePoint tasks</li>
+                    <li>Enhanced visual designer for complex state-machine workflows</li>
+                    <li>Bypass Power Automate limitations and throttling</li>
+                    <li>Detailed execution logs and alerts</li>
+                </ul>
+            </div>
+        </section>
 
+        <section id="product-dashboard" class="page-section">
+            <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
+            <div class="product-detail-header">
+                <h2>SharePoint Power Dashboard</h2>
+                <p>Executive visibility, configured in minutes.</p>
+            </div>
+            <div class="product-image-placeholder">
+                <img src="./img/PowerDashboard.png" alt="SharePoint Power Dashboard">
+            </div>
+            <div class="product-features">
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Aggregate list data across multiple site collections</li>
+                    <li>Pre-built chart, graph, and KPI metric widgets</li>
+                    <li>Role-based data filtering and security trimming</li>
+                    <li>Export visuals directly to PowerPoint</li>
+                </ul>
+            </div>
+        </section>
 
-        <div class="product-features">
-            <h3>Key Features</h3>
-            <ul>
-                <li>True CRON job scheduling for SharePoint tasks</li>
-                <li>Enhanced visual designer for complex state-machine workflows</li>
-                <li>Bypass Power Automate limitations and throttling</li>
-                <li>Detailed execution logs and alerts</li>
-            </ul>
-        </div>
-    </section>
+        <section id="product-report" class="page-section">
+            <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
+            <div class="product-detail-header">
+                <h2>SharePoint Power Report Builder</h2>
+                <p>Turn list data into formatted, printable documents.</p>
+            </div>
+            <div class="product-image-placeholder">
+                <img src="./img/PowerReportBuilder.png" alt="SharePoint Power Report Builder">
+            </div>
+            <div class="product-features">
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Pixel-perfect PDF generation from SharePoint List items</li>
+                    <li>Complex Excel exports with multiple sheets and pivot tables</li>
+                    <li>Mail-merge capabilities with Word templates</li>
+                    <li>Automated report distribution via email</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="product-dashboard" class="page-section">
-        <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
-        <div class="product-detail-header">
-            <h2>SharePoint Power Dashboard</h2>
-            <p>Executive visibility, configured in minutes.</p>
-        </div>
-        <div class="product-image-placeholder">
-            <img src="./img/PowerDashboard.png" alt="SharePoint Power Dashboard Explainer">
-        </div>
+        <section id="about" class="page-section">
+            <div class="content-card">
+                <h2>About Us</h2>
+                <p>At <strong>SharePoint Power Products</strong>, we recognized a massive bottleneck in modern enterprise environments: businesses spend too much time, budget, and resources writing custom code for problems that should be solved with configuration.</p>
+                <p>Our philosophy is simple: <strong>From Code to Configuration.</strong></p>
+                <p>By transforming complex development tasks into user-friendly configuration sliders, drag-and-drop interfaces, and automated syncs, we consistently reduce deployment times by 80%. Whether you need complex forms, enterprise-wide branding, or heavy data synchronization, our suite empowers your team to deliver solutions faster and maintain them easier.</p>
+            </div>
+        </section>
 
-        <div class="product-features">
-            <h3>Key Features</h3>
-            <ul>
-                <li>Aggregate list data across multiple site collections</li>
-                <li>Pre-built chart, graph, and KPI metric widgets</li>
-                <li>Role-based data filtering and security trimming</li>
-                <li>Export visuals directly to PowerPoint</li>
-            </ul>
-        </div>
-    </section>
-
-    <section id="product-report" class="page-section">
-        <button class="btn btn-secondary" onclick="showPage('home')">&larr; Back to Home</button>
-        <div class="product-detail-header">
-            <h2>SharePoint Power Report Builder</h2>
-            <p>Turn list data into formatted, printable documents.</p>
-        </div>
-        <div class="product-image-placeholder">
-            <img src="./img/PowerReportBuilder.png" alt="SharePoint Power Report Builder Explainer">
-        </div>
-
-        <div class="product-features">
-            <h3>Key Features</h3>
-            <ul>
-                <li>Pixel-perfect PDF generation from SharePoint List items</li>
-                <li>Complex Excel exports with multiple sheets and pivot tables</li>
-                <li>Mail-merge capabilities with Word templates</li>
-                <li>Automated report distribution via email</li>
-            </ul>
-        </div>
-    </section>
-
-    <section id="about" class="page-section">
-        <div class="content-card">
-            <h2>About Us</h2>
-            <p>At <strong>SharePoint Power Products</strong>, we recognized a massive bottleneck in modern
-                enterprise environments: businesses spend too much time, budget, and resources writing custom code
-                for problems that should be solved with configuration.</p>
-            <p>Our philosophy is simple: <strong>From Code to Configuration.</strong></p>
-            <p>By transforming complex development tasks into user-friendly configuration sliders, drag-and-drop
-                interfaces, and automated syncs, we consistently reduce deployment times by 80%. Whether you need
-                complex forms, enterprise-wide branding, or heavy data synchronization, our suite empowers your team
-                to deliver solutions faster and maintain them easier.</p>
-        </div>
-    </section>
-
-    <section id="contact" class="page-section">
-        <div class="content-card">
-            <h2>Contact Us</h2>
-            <p>Ready to accelerate your SharePoint environment? Have questions about licensing, deployment, or our
-                product roadmap? Reach out to our team directly.</p>
-
-            <a href="mailto:admin@M365powerproducts.com" class="contact-link">admin@M365powerproducts.com</a>
-
-            <p>We typically respond within 1 business day.</p>
-        </div>
-    </section>
+        <section id="contact" class="page-section">
+            <div class="content-card">
+                <h2>Contact Us</h2>
+                <p>Ready to accelerate your SharePoint environment? Have questions about licensing, deployment, or our product roadmap? Reach out to our team directly.</p>
+                <a href="mailto:admin@M365powerproducts.com" class="contact-link">admin@M365powerproducts.com</a>
+                <p>We typically respond within 1 business day.</p>
+            </div>
+        </section>
 
     </div>
 
@@ -508,19 +471,16 @@
 
     <script>
         function showPage(pageId) {
-            // Hide all sections
             const pages = document.querySelectorAll('.page-section');
             pages.forEach(page => {
                 page.style.display = 'none';
             });
 
-            // Show target section
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.style.display = 'block';
             }
 
-            // Scroll to the top of the container
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
