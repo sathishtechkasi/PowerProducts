@@ -1,0 +1,9 @@
+services:
+  spfxops:
+    build: .
+    working_dir: /workspace
+    user: "node"
+    volumes:
+      - ./:/workspace
+    stdin_open: true
+    tty: true

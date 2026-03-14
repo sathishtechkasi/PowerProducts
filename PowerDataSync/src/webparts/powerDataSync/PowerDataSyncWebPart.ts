@@ -166,7 +166,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
         ),
         React.createElement('div', { style: { fontSize: '13px', color: '#888', marginTop: '10px', padding: '10px', background: '#f5f5f5', borderRadius: '4px' } },
           'For queries, contact ',
-          React.createElement('a', { href: 'mailto:admin@Powertechnologies.ae', style: { color: '#0078d4', textDecoration: 'none', fontWeight: 600 } }, 'admin@Powertechnologies.ae')
+          React.createElement('a', { href: 'mailto:admin@m365powerproducts.com', style: { color: '#0078d4', textDecoration: 'none', fontWeight: 600 } }, 'admin@m365powerproducts.com')
         ),
         React.createElement('button', {
           style: {
