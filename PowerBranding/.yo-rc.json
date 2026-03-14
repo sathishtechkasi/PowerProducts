@@ -1,0 +1,20 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "useGulp": false,
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.22.1",
+    "sdksVersions": {},
+    "version": "1.22.2",
+    "libraryName": "power-branding",
+    "libraryId": "6a841905-f95e-4ec5-a276-746fd948e2c8",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "powerBranding",
+    "solutionShortDescription": "powerBranding description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "ApplicationCustomizer"
+  }
+}

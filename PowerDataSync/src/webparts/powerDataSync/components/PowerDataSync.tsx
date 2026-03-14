@@ -418,7 +418,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         selectedJobId: null,
         jobName: mode === 'new' ? '' : this.state.jobName
       }, () => {
-        if (mode === 'resume') this.loadExistingJobs();
+        if (mode === 'resume') void this.loadExistingJobs();
       });
     } catch (e: any) {
       void LoggerService.log(this.state.selectedList || 'System', 'handleJobModeChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);

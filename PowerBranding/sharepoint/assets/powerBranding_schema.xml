@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="PowerBranding" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/PowerBranding" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/" EnableContentTypes="FALSE" ListExperienceOptions="NewExperience">
+  <MetaData>
+    <Fields>
+      <Field ID="{1A2B3C4D-5E6F-7081-92A3-B4C5D6E7F8A9}" Name="Title" DisplayName="Rule Name" Type="Text" Required="TRUE" EnforceUniqueValues="TRUE" Indexed="TRUE" />
+      <Field ID="{2B3C4D5E-6F70-8192-A3B4-C5D6E7F8A9B0}" Name="Selector" DisplayName="CSS Selector" Type="Note" RichText="FALSE"  />
+      <Field ID="{3C4D5E6F-7081-92A3-B4C5-D6E7F8A9B0C1}" Name="ActionType" DisplayName="Action" Type="Choice">
+        <CHOICES>
+          <CHOICE>Hide</CHOICE>
+          <CHOICE>Style</CHOICE>
+          <CHOICE>Script</CHOICE>
+          <CHOICE>Loader</CHOICE>
+        </CHOICES>
+      </Field>
+      <Field ID="{4D5E6F70-8192-A3B4-C5D6-E7F8A9B0C1D2}" Name="CSSValue" DisplayName="Script CSS Rules" Type="Note" RichText="FALSE" />
+      <Field ID="{6F708192-A3B4-C5D6-E7F8-A9B0C1D2E3F4}" Name="IsOverride" DisplayName="Override Important" Type="Boolean" />
+      <Field ID="{5E6F7081-92A3-B4C5-D6E7-F8A9B0C1D2E3}" Name="IsActive" DisplayName="Active" Type="Boolean" />
+    </Fields>
+    <Views>
+      <View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          <FieldRef Name="Title" />
+          <FieldRef Name="Selector" />
+          <FieldRef Name="ActionType" />
+          <FieldRef Name="IsOverride" />
+          <FieldRef Name="IsActive" />
+        </ViewFields>
+        <Query>
+          <OrderBy>
+            <FieldRef Name="ID" Ascending="FALSE" />
+          </OrderBy>
+        </Query>
+      </View>
+    </Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+    </Forms>
+  </MetaData>
+</List>

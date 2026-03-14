@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "power-branding-client-side-solution",
+    "id": "6a841905-f95e-4ec5-a276-746fd948e2c8",
+    "version": "1.0.0.1",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.22.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "powerBranding description"
+      },
+      "longDescription": {
+        "default": "powerBranding description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "Power Branding Feature",
+        "description": "Deploys a custom action with ClientSideComponentId association",
+        "id": "795b2bf8-05f6-4443-97cf-018ee4c5ee17",
+        "version": "1.0.0.0",
+        "assets": {
+          "elementManifests": [
+            "powerBranding_elements.xml",
+            "powerBranding_schema.xml"
+          ]
+        }
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/power-branding.sppkg"
+  }
+}

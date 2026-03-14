@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">   
+    <CustomAction
+        Title="PowerBranding"
+        Location="ClientSideExtension.ApplicationCustomizer"
+        ClientSideComponentId="84f0373e-93e5-4c6a-8aa5-109793afa9e2"
+        ClientSideComponentProperties="{&quot;listName&quot;:&quot;PowerBranding&quot;,&quot;adminKey&quot;:&quot;SecureAdmin2026&quot;}">
+    </CustomAction>
+
+    <ListInstance
+        CustomSchema="powerBranding_schema.xml"
+        FeatureId="00bfea71-de22-43b2-a848-c05709900100"
+        Title="PowerBranding"
+        Description="Storage for SPFx Dynamic Rules"
+        TemplateType="100"
+        Url="Lists/PowerBranding"
+Hidden="TRUE">
+    </ListInstance>
+</Elements>

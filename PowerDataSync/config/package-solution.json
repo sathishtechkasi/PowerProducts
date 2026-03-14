@@ -3,7 +3,7 @@
   "solution": {
     "name": "power-data-sync-client-side-solution",
     "id": "6504a6e7-19c3-48db-a25b-be4ea36119c7",
-    "version": "1.0.0.5",
+    "version": "1.0.0.6",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

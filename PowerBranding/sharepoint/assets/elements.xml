@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+    <CustomAction
+        Title="PowerBranding"
+        Location="ClientSideExtension.ApplicationCustomizer"
+        ClientSideComponentId="8fee380c-a51d-4d17-b13b-348e9222ccf5"
+        ClientSideComponentProperties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
+    </CustomAction>
+</Elements>
