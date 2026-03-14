@@ -40,7 +40,7 @@ export class LogViewer extends React.Component<ILogViewerProps, ILogViewerState>
                     try {
                         this.setState({ selectionCount: this.selection.getSelectedCount() });
                     } catch (error: any) {
-                        LoggerService.log('Power DataSyncWeb Part', 'LogViewer-onSelectionChanged', 'Low', 'Config', error.message || JSON.stringify(error));
+                        void LoggerService.log('Power DataSyncWeb Part', 'LogViewer-onSelectionChanged', 'Low', 'Config', error.message || JSON.stringify(error));
                     }
                 }
             });
@@ -51,13 +51,13 @@ export class LogViewer extends React.Component<ILogViewerProps, ILogViewerState>
                 selectionCount: 0
             };
         } catch (error: any) {
-            LoggerService.log('Power DataSyncWeb Part', 'LogViewer-constructor', 'High', 'Config', error.message || JSON.stringify(error));
+            void LoggerService.log('Power DataSyncWeb Part', 'LogViewer-constructor', 'High', 'Config', error.message || JSON.stringify(error));
         }
     }
 
     public componentDidUpdate(prevProps: ILogViewerProps) {
         if (this.props.isOpen && !prevProps.isOpen) {
-            this.loadLogs();
+            void this.loadLogs();
         }
     }
 
@@ -67,7 +67,7 @@ export class LogViewer extends React.Component<ILogViewerProps, ILogViewerState>
             const logs = await LoggerService.getLogs(this.props.context, this.props.currentListTitle);
             this.setState({ items: logs, allItems: logs, loading: false });
         } catch (error: any) {
-            LoggerService.log('Power DataSyncWeb Part', 'LogViewer-loadLogs', 'High', 'Config', error.message || JSON.stringify(error));
+            void LoggerService.log('Power DataSyncWeb Part', 'LogViewer-loadLogs', 'High', 'Config', error.message || JSON.stringify(error));
             this.setState({ loading: false });
         }
     }
@@ -88,7 +88,7 @@ export class LogViewer extends React.Component<ILogViewerProps, ILogViewerState>
             );
             this.setState({ items: filtered });
         } catch (error: any) {
-            LoggerService.log('Power DataSyncWeb Part', 'LogViewer-onSearch', 'Medium', 'Config', error.message || JSON.stringify(error));
+            void LoggerService.log('Power DataSyncWeb Part', 'LogViewer-onSearch', 'Medium', 'Config', error.message || JSON.stringify(error));
         }
     }
 
@@ -110,7 +110,7 @@ export class LogViewer extends React.Component<ILogViewerProps, ILogViewerState>
             XLSX.utils.book_append_sheet(wb, ws, "Logs");
             XLSX.writeFile(wb, `Logs_${this.props.currentListTitle}.xlsx`);
         } catch (error: any) {
-            LoggerService.log('Power DataSyncWeb Part', 'LogViewer-exportLogs', 'High', 'Config', error.message || JSON.stringify(error));
+            void LoggerService.log('Power DataSyncWeb Part', 'LogViewer-exportLogs', 'High', 'Config', error.message || JSON.stringify(error));
         }
     }
 

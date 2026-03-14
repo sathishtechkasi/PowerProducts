@@ -59,15 +59,15 @@ export default class PowerDashboard extends React.Component<PowerDashboardProps,
       // 2. Pass the SPFI instance to the DataSyncHistoryService
       this.service = new DataSyncHistoryService(this.sp, this.props.metricsListTitle);
     } catch (e: any) {
-      LoggerService.log('System', 'PowerDashboard-constructor', 'High', 'Init', e.message);
+      void LoggerService.log('System', 'PowerDashboard-constructor', 'High', 'Init', e.message);
     }
   }
 
   public componentDidMount() {
     try {
-      this.loadData();
+      void this.loadData();
     } catch (e: any) {
-      LoggerService.log('System', 'componentDidMount', 'High', 'Init', e.message);
+      void LoggerService.log('System', 'componentDidMount', 'High', 'Init', e.message);
     }
   }
 
@@ -126,7 +126,7 @@ export default class PowerDashboard extends React.Component<PowerDashboardProps,
     } catch (err: any) {
       console.error(err);
       const logTarget = this.props.metricsListTitle || 'System';
-      LoggerService.log(logTarget, 'loadData', 'High', 'Read', err.message);
+      void LoggerService.log(logTarget, 'loadData', 'High', 'Read', err.message);
       this.setState({ loading: false });
     }
   }
@@ -144,7 +144,7 @@ export default class PowerDashboard extends React.Component<PowerDashboardProps,
         page: 1
       });
     } catch (e: any) {
-      LoggerService.log('System', 'clearFilters', 'Low', 'UI', e.message);
+      void LoggerService.log('System', 'clearFilters', 'Low', 'UI', e.message);
     }
   }
 
@@ -167,7 +167,7 @@ export default class PowerDashboard extends React.Component<PowerDashboardProps,
       
       return true;
     } catch (e: any) {
-      LoggerService.log('System', 'matches', 'Medium', 'Filter', e.message);
+      void LoggerService.log('System', 'matches', 'Medium', 'Filter', e.message);
       return false;
     }
   }
@@ -207,7 +207,7 @@ export default class PowerDashboard extends React.Component<PowerDashboardProps,
         return `${day} ${month} ${year}`;
       }
     } catch (e: any) {
-      LoggerService.log('System', 'pretty', 'Low', 'Format', e.message);
+      void LoggerService.log('System', 'pretty', 'Low', 'Format', e.message);
       return '—';
     }
   }

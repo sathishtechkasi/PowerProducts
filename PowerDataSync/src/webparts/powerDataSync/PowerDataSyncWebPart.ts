@@ -85,7 +85,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
       );
       
       // 3. Pre-load lists for the "Use Existing" dropdown
-      await this.loadLists();
+      await void this.loadLists();
     });
   }
 
@@ -232,13 +232,13 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
   private async provisionLogEnvironment(): Promise<void> {
     const { logListTitle, logRoleName } = this.properties;
     if (!logListTitle || !logRoleName) {
-      Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter both a Log List Name and a Role Name." });
+      void Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter both a Log List Name and a Role Name." });
       return;
     }
 
     try {
       // --- SHOW LOADING POPUP ---
-      Swal.fire({
+      void Swal.fire({
         title: 'Provisioning Logs...',
         html: `Creating list <b>${logListTitle}</b> and configuring permissions. Please wait...`,
         allowOutsideClick: false,
@@ -248,7 +248,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
       // UPGRADE: Check if list exists using v4 execution ()
       try {
         await this.sp.web.lists.getByTitle(logListTitle)();
-        Swal.fire({ icon: 'info', title: 'Exists', text: `List "${logListTitle}" already exists.` });
+        void Swal.fire({ icon: 'info', title: 'Exists', text: `List "${logListTitle}" already exists.` });
       } catch (e) {
         // 1. Create List
         await this.sp.web.lists.add(logListTitle, "System Logs", 100);
@@ -284,11 +284,11 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
           console.warn("Could not set permission automatically", permErr);
         }
 
-        Swal.fire({ icon: 'success', title: 'Success', text: `Log List "${logListTitle}" created successfully.` });
+        void Swal.fire({ icon: 'success', title: 'Success', text: `Log List "${logListTitle}" created successfully.` });
       }
     } catch (e: any) {
       console.error("Critical Error in provisionLogEnvironment:", e);
-      Swal.fire({ icon: 'error', title: 'Error', text: e.message });
+      void Swal.fire({ icon: 'error', title: 'Error', text: e.message });
     }
   }
 
@@ -302,7 +302,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
           buttonType: PropertyPaneButtonType.Primary,
           icon: 'Save',
           onClick: () => {
-            Swal.fire({ icon: 'success', title: 'Success', text: "Configuration saved successfully!" });
+            void Swal.fire({ icon: 'success', title: 'Success', text: "Configuration saved successfully!" });
             (this.context.propertyPane as any).close();
           }
         }) as any,
@@ -323,7 +323,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
   private async provisionMetricsEnvironment(): Promise<void> {
     const listTitle = this.properties.metricsListTitle;
     if (!listTitle) {
-      Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter a name for the Metrics List." });
+      void Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter a name for the Metrics List." });
       return;
     }
     const libTitle = `${listTitle}Documents`;
@@ -331,7 +331,7 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
 
     try {
       // --- SHOW LOADING POPUP ---
-      Swal.fire({
+      void Swal.fire({
         title: 'Provisioning Metrics...',
         html: `Creating list <b>${listTitle}</b> and library <b>${libTitle}</b>. Please wait...`,
         allowOutsideClick: false,
@@ -385,13 +385,13 @@ export default class PowerDataSyncWebPart extends BaseClientSideWebPart<IPowerDa
         await this.sp.web.lists.add(libTitle, "Stores source and result files", 101, false);
       }
 
-      Swal.fire({
+      void Swal.fire({
         icon: 'success',
         title: 'Environment Ready',
         text: `Metrics list "${listTitle}" and Library "${libTitle}" have been created and configured.`
       });
     } catch (e: any) {
-      Swal.fire({ icon: 'error', title: 'Error', text: e.message });
+      void Swal.fire({ icon: 'error', title: 'Error', text: e.message });
     }
   }
 

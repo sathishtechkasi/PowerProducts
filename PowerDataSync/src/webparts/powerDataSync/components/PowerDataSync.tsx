@@ -29,8 +29,8 @@ const clean = (s: any): string => {
       .replace(/\u00A0/g, ' ')     // NBSP -> space
       .replace(/\s+/g, ' ')        // collapse whitespace
       .trim();
-  } catch (e:any) {
-    LoggerService.log('System', 'clean', 'Medium', 'N/A', e.message);
+  } catch (e: any) {
+    void LoggerService.log('System', 'clean', 'Medium', 'N/A', e.message);
     return '';
   }
 };
@@ -61,8 +61,8 @@ const splitChoiceCell = (
       return val.split(',').map(clean).filter(Boolean);
     }
     return [val];
-  } catch (e:any) {
-    LoggerService.log('System', 'splitChoiceCell', 'Medium', 'N/A', e.message);
+  } catch (e: any) {
+    void LoggerService.log('System', 'splitChoiceCell', 'Medium', 'N/A', e.message);
     return [];
   }
 };
@@ -73,8 +73,8 @@ const toChoicesArray = (choices: any): string[] => {
     if (Array.isArray(choices)) return choices;
     if (choices && Array.isArray(choices.results)) return choices.results;
     return [];
-  } catch (e:any) {
-    LoggerService.log('System', 'toChoicesArray', 'Medium', 'N/A', e.message);
+  } catch (e: any) {
+    void LoggerService.log('System', 'toChoicesArray', 'Medium', 'N/A', e.message);
     return [];
   }
 };
@@ -150,8 +150,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         baseFailureCount: 0,
         basePlannedCount: 0
       };
-    } catch (e:any) {
-      LoggerService.log('System', 'constructor', 'High', 'Init', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'constructor', 'High', 'Init', e.message);
     }
   }
   // Load SharePoint lists on mount
@@ -171,11 +171,11 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       this.setState({ lists: rawLists.map(function (l) { return l.Title; }) });
       // If a resumeJobId is passed, load that job immediately
       if (this.props.resumeJobId) {
-        this.handleSelectExistingJob(String(this.props.resumeJobId));
+        void this.handleSelectExistingJob(String(this.props.resumeJobId));
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error loading lists:', error);
-      LoggerService.log('System', 'componentDidMount - ' + (this.state ? this.state.jobName : ''), 'High', 'Init', error.message);
+      void LoggerService.log('System', 'componentDidMount - ' + (this.state ? this.state.jobName : ''), 'High', 'Init', error.message);
       this.setState({ fileError: 'Failed to load SharePoint lists.' });
     }
   }
@@ -201,16 +201,16 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         default:
           return false;
       }
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'canGoNext - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'canGoNext - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
       return false;
     }
   }
-  private setBulkState = (updates: Partial<IPowerDataSyncState>, callback?: () => void) => {
+  private setDataSyncState = (updates: Partial<IPowerDataSyncState>, callback?: () => void) => {
     try {
       this.setState(updates as any, callback);
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'setBulkState - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'setDataSyncState - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // ---------------- Wizard ----------------
@@ -221,10 +221,10 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       this.setState({ currentStep: n, validationError: '' });
       // If entering step 5 and resume mode, fetch existing jobs (lazy)
       if (n === 5 && this.state.jobMode === 'resume') {
-        this.loadExistingJobs();
+        void this.loadExistingJobs();
       }
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'goToStep - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'goToStep - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   private jobNameTimeout: any = null;
@@ -258,7 +258,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             jobNameError: exists.length > 0 ? 'Job name already exists' : '',
             jobNameChecking: false
           });
-        } catch (err:any)  {
+        } catch (err: any) {
           console.error('Job name check failed:', err);
           // IF 404, IT MEANS THE LIST DOES NOT EXIST. DO NOT ALLOW PROCEEDING.
           if (err.message && err.message.indexOf('404') !== -1) {
@@ -271,8 +271,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           }
         }
       }, 400);
-    } catch (e:any) {
-      LoggerService.log('System', 'checkJobName', 'Medium', 'N/A', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'checkJobName', 'Medium', 'N/A', e.message);
     }
   }
   private fetchSourceFile = async (url: string): Promise<Uint8Array> => {
@@ -281,8 +281,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       const file = this.sp.web.getFileByServerRelativePath(serverRelativeUrl);
       const buffer = await file.getBuffer();
       return new Uint8Array(buffer);
-    } catch (err:any)  {
-      LoggerService.log(this.state.selectedList || 'System', 'fetchSourceFile - ' + this.state.jobName, 'High', this.state.mode, err.message);
+    } catch (err: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'fetchSourceFile - ' + this.state.jobName, 'High', this.state.mode, err.message);
       throw new Error(`Failed to load source file: ${err && (err as any).message ? (err as any).message : String(err)}`);
     }
   }
@@ -359,16 +359,16 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         }
       }
       return true;
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'validateStep - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'validateStep - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
       return false;
     }
   }
   private handleBack = () => {
     try {
       this.goToStep(this.state.currentStep - 1);
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleBack - ' + this.state.jobName, 'Low', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleBack - ' + this.state.jobName, 'Low', this.state.mode, e.message);
     }
   }
   private handleNext = async () => {
@@ -382,8 +382,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       if (this.validateStep(currentStep)) {
         this.goToStep(currentStep + 1);
       }
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleNext - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleNext - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // ----------- Job (resume) helpers -----------
@@ -399,14 +399,14 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           .top(100)
           ();
         this.setState({ existingJobs: jobs });
-      } catch (err:any)  {
+      } catch (err: any) {
         console.error(err);
-        LoggerService.log(this.props.metricsListTitle, 'loadExistingJobs - ' + this.state.jobName, 'High', this.state.mode, err.message);
+        void LoggerService.log(this.props.metricsListTitle, 'loadExistingJobs - ' + this.state.jobName, 'High', this.state.mode, err.message);
       } finally {
         this.setState({ isLoading: false });
       }
-    } catch (e:any) {
-      LoggerService.log('System', 'loadExistingJobs(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'loadExistingJobs(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
     }
   }
   //  -------------- Job mode --------------
@@ -420,8 +420,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       }, () => {
         if (mode === 'resume') this.loadExistingJobs();
       });
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleJobModeChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleJobModeChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   private handleSelectExistingJob = async (idStr: string) => {
@@ -556,22 +556,22 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
                 });
                 this.setState({ selectedByField: newSelected });
               });
-            } catch (err:any)  {
+            } catch (err: any) {
               console.error('Failed to load fields for resume', err);
-              LoggerService.log(historyItem.DataSycnList || 'System', 'handleSelectExistingJob-fields - ' + this.state.jobName, 'High', this.state.mode, err.message);
+              void LoggerService.log(historyItem.DataSycnList || 'System', 'handleSelectExistingJob-fields - ' + this.state.jobName, 'High', this.state.mode, err.message);
             }
           }
         });
-      } catch (err:any)  {
+      } catch (err: any) {
         console.error('Resume failed', err);
-        LoggerService.log('System', 'handleSelectExistingJob - ' + this.state.jobName, 'High', this.state.mode, err.message);
+        void LoggerService.log('System', 'handleSelectExistingJob - ' + this.state.jobName, 'High', this.state.mode, err.message);
         this.setState({
           isLoading: false,
           validationError: `Resume failed: ${(err as any).message || err}`
         });
       }
-    } catch (e:any) {
-      LoggerService.log('System', 'handleSelectExistingJob(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'handleSelectExistingJob(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
     }
   }
   private loadFieldsForResume = (listName: string, callback: () => void) => {
@@ -600,10 +600,10 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           }, callback);  // ← callback runs after fields set
         })
         .catch(err => {
-          LoggerService.log(listName || 'System', 'loadFieldsForResume - ' + this.state.jobName, 'High', this.state.mode, err.message);
+          void LoggerService.log(listName || 'System', 'loadFieldsForResume - ' + this.state.jobName, 'High', this.state.mode, err.message);
         });
-    } catch (e:any) {
-      LoggerService.log(listName || 'System', 'loadFieldsForResume(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(listName || 'System', 'loadFieldsForResume(wrapper) - ' + this.state.jobName, 'High', this.state.mode, e.message);
     }
   }
   private loadFileFromUrl = async (url: string): Promise<Uint8Array> => {
@@ -612,8 +612,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       const file = this.sp.web.getFileByServerRelativePath(serverRelativeUrl);
       const buffer = await file.getBuffer();
       return new Uint8Array(buffer);
-    } catch (err:any)  {
-      LoggerService.log(this.state.selectedList || 'System', 'loadFileFromUrl - ' + this.state.jobName, 'High', this.state.mode, err.message);
+    } catch (err: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'loadFileFromUrl - ' + this.state.jobName, 'High', this.state.mode, err.message);
       throw new Error(`Could not download source file: ${err.message}`);
     }
   }
@@ -673,15 +673,15 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             startRow: 1,
             endRow: json.length
           }, this.autoMapFields);
-        } catch (err:any)  {
+        } catch (err: any) {
           console.error(err);
-          LoggerService.log('System', 'handleFileUpload(reader) - ' + this.state.jobName, 'High', this.state.mode, err.message);
+          void LoggerService.log('System', 'handleFileUpload(reader) - ' + this.state.jobName, 'High', this.state.mode, err.message);
           this.setState({ fileError: 'Error parsing file.' });
         }
       };
       reader.readAsArrayBuffer(file);
-    } catch (e:any) {
-      LoggerService.log('System', 'handleFileUpload - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'handleFileUpload - ' + this.state.jobName, 'High', this.state.mode, e.message);
     }
   }
   private handleSheetChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -701,15 +701,15 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         validationIssues: [],
         validationRan: false
       }, this.autoMapFields);
-    } catch (e:any) {
-      LoggerService.log('System', 'handleSheetChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'handleSheetChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // Safe wrapper for hasPermissions (avoid runtime throws on odd masks)
   private has(perms: any, kind: PermissionKind): boolean {
     try {
       return this.sp.web.hasPermissions(perms, kind) === true;
-    } catch (e:any) {
+    } catch (e: any) {
       return false;
     }
   }
@@ -734,8 +734,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         const p1: any = await list.getCurrentUserEffectivePermissions();
         canAdd = this.has(p1, PermissionKind.AddListItems);
         canEdit = this.has(p1, PermissionKind.EditListItems);
-      } catch (e1:any) {
-        LoggerService.log(title, 'checkListPermissions(list) - ' + this.state.jobName, 'Low', this.state.mode, e1.message);
+      } catch (e1: any) {
+        void LoggerService.log(title, 'checkListPermissions(list) - ' + this.state.jobName, 'Low', this.state.mode, e1.message);
       }
       // 2) If both false, try explicit user on LIST
       if (!canAdd && !canEdit) {
@@ -746,8 +746,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             canAdd = this.has(p2, PermissionKind.AddListItems);
             canEdit = this.has(p2, PermissionKind.EditListItems);
           }
-        } catch (e2:any) {
-          LoggerService.log(title, 'checkListPermissions(user) - ' + this.state.jobName, 'Low', this.state.mode, e2.message);
+        } catch (e2: any) {
+          void LoggerService.log(title, 'checkListPermissions(user) - ' + this.state.jobName, 'Low', this.state.mode, e2.message);
         }
       }
       // 3) If still false, check WEB perms as heuristic (some SE farms return only web perms)
@@ -760,14 +760,14 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             // We can’t prove list-level rights, but web looks OK; don’t block UI.
             unknown = true;
           }
-        } catch (e3:any) {
-          LoggerService.log(title, 'checkListPermissions(web) - ' + this.state.jobName, 'Low', this.state.mode, e3.message);
+        } catch (e3: any) {
+          void LoggerService.log(title, 'checkListPermissions(web) - ' + this.state.jobName, 'Low', this.state.mode, e3.message);
         }
       }
-    } catch (outer:any) {
+    } catch (outer: any) {
       // If the list lookup itself failed, mark as unknown so UI won’t block
       unknown = true;
-      LoggerService.log(title, 'checkListPermissions(outer) - ' + this.state.jobName, 'Medium', this.state.mode, outer.message);
+      void LoggerService.log(title, 'checkListPermissions(outer) - ' + this.state.jobName, 'Medium', this.state.mode, outer.message);
     }
     return { canAdd, canEdit, unknown };
   }
@@ -803,9 +803,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         }
         this.setState({ fields: visibleFields }, this.autoMapFields);
         this.setState({ fields: visibleFields }, this.autoMapFields);
-      } catch (error:any) {
+      } catch (error: any) {
         console.error('Error loading fields:', error);
-        LoggerService.log(title || 'System', 'handleListChange-fields - ' + this.state.jobName, 'High', this.state.mode, error.message);
+        void LoggerService.log(title || 'System', 'handleListChange-fields - ' + this.state.jobName, 'High', this.state.mode, error.message);
         this.setState({ fileError: 'Failed loading fields.' });
       }
       // Permissions for the selected list
@@ -817,13 +817,13 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         });
         /*TODO*/
         /* this.setState({ canAdd: true, canEdit: true });*/
-      } catch (permErr:any) {
+      } catch (permErr: any) {
         console.warn('Could not read permissions for list', permErr);
-        LoggerService.log(title || 'System', 'handleListChange-perms - ' + this.state.jobName, 'Medium', this.state.mode, permErr.message);
+        void LoggerService.log(title || 'System', 'handleListChange-perms - ' + this.state.jobName, 'Medium', this.state.mode, permErr.message);
         this.setState({ canAdd: true, canEdit: true });
       }
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleListChange(wrapper) - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleListChange(wrapper) - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // -------------- Auto-map --------------
@@ -848,25 +848,25 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         if (chosen) assigned[chosen] = true;
       }
       this.setState({ excelMapByField: byField, selectedByField: selected });
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'autoMapFields - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'autoMapFields - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   private handleExcelMapChange = (internal: string, col: string) => {
     try {
       this.setState(function (prev) {
         const newMap: { [k: string]: string } = {};
-        for (const k in prev.excelMapByField) if (prev.excelMapByField.hasOwnProperty(k)) newMap[k] = prev.excelMapByField[k];
+        for (const k in prev.excelMapByField) if (Object.prototype.hasOwnProperty.call(prev.excelMapByField, k)) newMap[k] = prev.excelMapByField[k];
         if (col) {
           for (const k in newMap) {
-            if (newMap.hasOwnProperty(k) && k !== internal && newMap[k] === col) {
+            if (Object.prototype.hasOwnProperty.call(newMap, k) && k !== internal && newMap[k] === col) {
               newMap[k] = '';
             }
           }
         }
         newMap[internal] = col;
         const newSel: { [k: string]: boolean } = {};
-        for (const k in prev.selectedByField) if (prev.selectedByField.hasOwnProperty(k)) newSel[k] = prev.selectedByField[k];
+        for (const k in prev.selectedByField) if (Object.prototype.hasOwnProperty.call(prev.selectedByField, k)) newSel[k] = prev.selectedByField[k];
         newSel[internal] = !!col || !!prev.selectedByField[internal];
         return {
           excelMapByField: newMap,
@@ -875,8 +875,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           validationRan: false
         } as any;
       });
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleExcelMapChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleExcelMapChange - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // Map the chosen Excel primary column to the SP internal name
@@ -885,14 +885,14 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       const { excelMapByField, primaryField } = this.state;
       if (!primaryField) return null;
       for (const internal in excelMapByField) {
-        if (excelMapByField.hasOwnProperty(internal) &&
+        if (Object.prototype.hasOwnProperty.call(excelMapByField, internal) &&
           excelMapByField[internal] === primaryField) {
           return internal;
         }
       }
       return null;
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'getSpFieldForExcelselection - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'getSpFieldForExcelselection - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
       return null;
     }
   }
@@ -900,49 +900,49 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
     try {
       this.setState(function (prev) {
         const newSel: { [k: string]: boolean } = {};
-        for (const k in prev.selectedByField) if (prev.selectedByField.hasOwnProperty(k)) newSel[k] = prev.selectedByField[k];
+        for (const k in prev.selectedByField) if (Object.prototype.hasOwnProperty.call(prev.selectedByField, k)) newSel[k] = prev.selectedByField[k];
         newSel[internal] = checked;
         return { selectedByField: newSel, validationIssues: [], validationRan: false } as any;
       });
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'handleFieldCheck - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'handleFieldCheck - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // Ensure Choices (and FillInChoice) are present for Choice/MultiChoice
   private async ensureChoicesForField(listTitle: string, f: IFieldInfo): Promise<IFieldInfo> {
     try {
       if (!(/Choice/i.test(f.TypeAsString))) return f;
-      var anyF: any = f;
-      var needsChoices = !(anyF.Choices && anyF.Choices.length);
-      var lacksFillIn = typeof anyF.FillInChoice === 'undefined';
+      let anyF: any = f;
+      let needsChoices = !(anyF.Choices && anyF.Choices.length);
+      let lacksFillIn = typeof anyF.FillInChoice === 'undefined';
       if (!needsChoices && !lacksFillIn) return f;
       try {
-        var full: any = await this.sp.web.lists.getByTitle(listTitle)
+        let full: any = await this.sp.web.lists.getByTitle(listTitle)
           .fields.getByInternalNameOrTitle(f.InternalName)
           ();
         if (full) {
           if (full.Choices) anyF.Choices = full.Choices as string[];
           if (typeof full.FillInChoice !== 'undefined') anyF.FillInChoice = !!full.FillInChoice;
         }
-      } catch (e:any) {
-        LoggerService.log(listTitle, 'ensureChoicesForField(inner) - ' + this.state.jobName, 'Low', this.state.mode, e.message);
+      } catch (e: any) {
+        void LoggerService.log(listTitle, 'ensureChoicesForField(inner) - ' + this.state.jobName, 'Low', this.state.mode, e.message);
       }
       return f;
-    } catch (e:any) {
-      LoggerService.log(listTitle, 'ensureChoicesForField(wrapper) - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(listTitle, 'ensureChoicesForField(wrapper) - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
       return f;
     }
   }
   // Re-validates the current selection/range and fills state.validationIssues + issueCounts
   private runDataValidation = async (): Promise<void> => {
     try {
-      var excelData = this.state.excelData;
-      var fields = this.state.fields;
-      var excelMapByField = this.state.excelMapByField;
-      var selectedByField = this.state.selectedByField;
-      var startRow = this.state.startRow || 1;
-      var endRow = (this.state.endRow || excelData.length);
-      var selectedList = this.state.selectedList;
+      let excelData = this.state.excelData;
+      let fields = this.state.fields;
+      let excelMapByField = this.state.excelMapByField;
+      let selectedByField = this.state.selectedByField;
+      let startRow = this.state.startRow || 1;
+      let endRow = (this.state.endRow || excelData.length);
+      let selectedList = this.state.selectedList;
       const splitTokens = (raw: any): string[] => {
         try {
           if (raw === null || raw === undefined) return [];
@@ -951,27 +951,27 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             .split(/[;,]/)
             .map(function (s) { return s.trim(); })
             .filter(function (s) { return !!s; });
-        } catch (e:any) {
-          LoggerService.log('System', 'splitTokens', 'Low', 'N/A', e.message);
+        } catch (e: any) {
+          void LoggerService.log('System', 'splitTokens', 'Low', 'N/A', e.message);
           return [];
         }
       };
       // Helper: tokenize multi-value cells like "A;#B", "A;B", or "A,B"
       // Build Choice metadata (Allowed values + FillInChoice) per field
-      var choiceAllowedByField: { [internal: string]: { [lower: string]: boolean } } = {};
-      var choiceAllowedListByField: { [internal: string]: string[] } = {};
-      var fillInChoiceByField: { [internal: string]: boolean } = {};
+      let choiceAllowedByField: { [internal: string]: { [lower: string]: boolean } } = {};
+      let choiceAllowedListByField: { [internal: string]: string[] } = {};
+      let fillInChoiceByField: { [internal: string]: boolean } = {};
       // First pass: use what we already have on the field (Choices / FillInChoice)
-      for (var i = 0; i < fields.length; i++) {
-        var f1 = fields[i];
+      for (let i = 0; i < fields.length; i++) {
+        let f1 = fields[i];
         if (!(/Choice/i).test(f1.TypeAsString)) continue;
-        var allowedList: string[] = toChoicesArray((f1 as any).Choices);
-        var fillIn = !!(f1 as any).FillInChoice;
+        let allowedList: string[] = toChoicesArray((f1 as any).Choices);
+        let fillIn = !!(f1 as any).FillInChoice;
         // If we don't have Choices or FillInChoice yet, attempt to read from the list field definition
         if ((!allowedList || !allowedList.length) || (typeof (f1 as any).FillInChoice === 'undefined')) {
           if (selectedList) {
             try {
-              var def: any = await this.sp.web.lists
+              let def: any = await this.sp.web.lists
                 .getByTitle(selectedList)
                 .fields
                 .getByInternalNameOrTitle(f1.InternalName)
@@ -983,17 +983,17 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
               if (def && typeof def.FillInChoice !== 'undefined') {
                 fillIn = !!def.FillInChoice;
               }
-            } catch (e:any) {
-              LoggerService.log(selectedList, 'runDataValidation(choices) - ' + this.state.jobName, 'Low', this.state.mode, e.message);
+            } catch (e: any) {
+              void LoggerService.log(selectedList, 'runDataValidation(choices) - ' + this.state.jobName, 'Low', this.state.mode, e.message);
             }
           }
         }
         // Normalize allowed choices
-        var map: { [lower: string]: boolean } = {};
-        var normalized: string[] = [];
+        let map: { [lower: string]: boolean } = {};
+        let normalized: string[] = [];
         if (allowedList && allowedList.length) {
-          for (var a = 0; a < allowedList.length; a++) {
-            var ch = clean(allowedList[a]);
+          for (let a = 0; a < allowedList.length; a++) {
+            let ch = clean(allowedList[a]);
             if (ch) {
               map[ch.toLowerCase()] = true;
               normalized.push(ch);
@@ -1005,47 +1005,47 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         fillInChoiceByField[f1.InternalName] = !!fillIn;
       }
       // Track in-sheet uniqueness for fields that enforce unique
-      var uniqueTrack: { [internal: string]: { seen: { [val: string]: number }, title: string } } = {};
-      for (var u = 0; u < fields.length; u++) {
-        var fu = fields[u];
+      let uniqueTrack: { [internal: string]: { seen: { [val: string]: number }, title: string } } = {};
+      for (let u = 0; u < fields.length; u++) {
+        let fu = fields[u];
         if ((fu as any).EnforceUniqueValues) {
           uniqueTrack[fu.InternalName] = { seen: {}, title: fu.Title || fu.InternalName };
         }
       }
       // Collect which user values exist to validate (batch ensure)
-      var userFields: any[] = [];
-      for (var uf = 0; uf < fields.length; uf++) {
-        var fU = fields[uf];
+      let userFields: any[] = [];
+      for (let uf = 0; uf < fields.length; uf++) {
+        let fU = fields[uf];
         if ((/User/i).test(fU.TypeAsString) && selectedByField[fU.InternalName] && excelMapByField[fU.InternalName]) {
           userFields.push(fU);
         }
       }
       //
-      var userValidValueByField: { [internal: string]: { [valLower: string]: boolean } } = {};
-      var from = Math.max(1, Math.min(startRow, excelData.length)) - 1;
-      var to = Math.max(from, Math.min(endRow, excelData.length)) - 1;
+      let userValidValueByField: { [internal: string]: { [valLower: string]: boolean } } = {};
+      let from = Math.max(1, Math.min(startRow, excelData.length)) - 1;
+      let to = Math.max(from, Math.min(endRow, excelData.length)) - 1;
       // Collect distinct user tokens per user field across the selected range
-      for (var uf2 = 0; uf2 < userFields.length; uf2++) {
-        var f2 = userFields[uf2];
-        var internalUser = f2.InternalName;
-        var colUser = excelMapByField[internalUser];
-        var seenVals: { [valLower: string]: boolean } = {};
-        for (var idxi = from; idxi <= to; idxi++) {
-          var rowi = excelData[idxi];
-          var rawi = rowi[colUser];
+      for (let uf2 = 0; uf2 < userFields.length; uf2++) {
+        let f2 = userFields[uf2];
+        let internalUser = f2.InternalName;
+        let colUser = excelMapByField[internalUser];
+        let seenVals: { [valLower: string]: boolean } = {};
+        for (let idxi = from; idxi <= to; idxi++) {
+          let rowi = excelData[idxi];
+          let rawi = rowi[colUser];
           if (rawi == null || String(rawi).trim() === '') continue;
-          var isMultiUser = (/Multi/i).test(f2.TypeAsString);
+          let isMultiUser = (/Multi/i).test(f2.TypeAsString);
           if (isMultiUser) {
-            var parts0 = splitTokens(rawi);
-            for (var p0 = 0; p0 < parts0.length; p0++) {
-              var v0 = parts0[p0];
-              var low0 = v0.toLowerCase();
+            let parts0 = splitTokens(rawi);
+            for (let p0 = 0; p0 < parts0.length; p0++) {
+              let v0 = parts0[p0];
+              let low0 = v0.toLowerCase();
               if (!seenVals[low0]) seenVals[low0] = false;
             }
           } else {
-            var v1 = String(rawi).trim();
+            let v1 = String(rawi).trim();
             if (v1) {
-              var low1 = v1.toLowerCase();
+              let low1 = v1.toLowerCase();
               if (!seenVals[low1]) seenVals[low1] = false;
             }
           }
@@ -1053,12 +1053,12 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         userValidValueByField[internalUser] = seenVals;
       }
       // Validate the collected user identities exist (best-effort)
-      for (var uf3 = 0; uf3 < userFields.length; uf3++) {
-        var f3 = userFields[uf3];
-        var internal3 = f3.InternalName;
-        var validMap = userValidValueByField[internal3];
-        for (var low in validMap) {
-          if (!validMap.hasOwnProperty(low)) continue;
+      for (let uf3 = 0; uf3 < userFields.length; uf3++) {
+        let f3 = userFields[uf3];
+        let internal3 = f3.InternalName;
+        let validMap = userValidValueByField[internal3];
+        for (let low in validMap) {
+          if (!Object.prototype.hasOwnProperty.call(validMap, low)) continue;
 
           // --- STRICT FORMAT CHECK ---
           // Must start with 'i:0#.w|' (standard claims prefix)
@@ -1075,24 +1075,24 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           try {
             await this.sp.web.ensureUser(low);
             validMap[low] = true;
-          } catch (e:any) {
+          } catch (e: any) {
             validMap[low] = false;
           }
         }
       }
       // Now perform row-by-row validation
-      var issues: IValidationIssue[] = [];
-      for (var idx = from; idx <= to; idx++) {
-        var row = excelData[idx];
+      let issues: IValidationIssue[] = [];
+      for (let idx = from; idx <= to; idx++) {
+        let row = excelData[idx];
         // Displayed row number within selected range (1-based)
-        var dispRow = (idx - from + 1);
-        for (var fi = 0; fi < fields.length; fi++) {
-          var f = fields[fi];
-          var internal = f.InternalName;
+        let dispRow = (idx - from + 1);
+        for (let fi = 0; fi < fields.length; fi++) {
+          let f = fields[fi];
+          let internal = f.InternalName;
           if (!selectedByField[internal]) continue;
-          var excelCol = excelMapByField[internal];
+          let excelCol = excelMapByField[internal];
           if (!excelCol) continue;
-          var raw = row[excelCol];
+          let raw = row[excelCol];
           // --- Required check ---
           if (f.Required) {
             if (raw === null || raw === undefined || this.cleanCell(raw) === '') {
@@ -1102,8 +1102,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           // --- Number-like fields ---
           if ((/Number|Currency|Counter/i).test(f.TypeAsString)) {
             if (!(raw === null || raw === undefined || this.cleanCell(raw) === '')) {
-              var s = this.cleanCell(raw);
-              var asNum = parseFloat(s);
+              let s = this.cleanCell(raw);
+              let asNum = parseFloat(s);
               if (isNaN(asNum)) {
                 issues.push({ row: dispRow, column: (f.Title || internal), detail: 'Expected a number but found "' + s + '".', type: 'number' });
               }
@@ -1134,14 +1134,14 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           }
           // --- User existence (single/multi) ---
           if ((/User/i).test(f.TypeAsString)) {
-            var validUserMap = userValidValueByField[internal];
+            let validUserMap = userValidValueByField[internal];
             if (validUserMap && !(raw === null || raw === undefined || this.cleanCell(raw) === '')) {
-              var isMultiUser2 = (/Multi/i).test(f.TypeAsString);
+              let isMultiUser2 = (/Multi/i).test(f.TypeAsString);
               if (isMultiUser2) {
-                var uparts = splitTokens(raw);
-                for (var up = 0; up < uparts.length; up++) {
-                  var uv = uparts[up];
-                  var ulow = uv.toLowerCase();
+                let uparts = splitTokens(raw);
+                for (let up = 0; up < uparts.length; up++) {
+                  let uv = uparts[up];
+                  let ulow = uv.toLowerCase();
                   if (validUserMap[ulow] !== true) {
                     // Custom message based on format
                     let msg = 'User "' + uv + '" not found.';
@@ -1152,9 +1152,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
                   }
                 }
               } else {
-                var uv1 = this.cleanCell(raw);
+                let uv1 = this.cleanCell(raw);
                 if (uv1) {
-                  var ul1 = uv1.toLowerCase();
+                  let ul1 = uv1.toLowerCase();
                   if (validUserMap[ul1] !== true) {
                     issues.push({ row: dispRow, column: (f.Title || internal), detail: 'User "' + uv1 + '" not found.', type: 'user' });
                   }
@@ -1164,9 +1164,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           }
           // --- Unique in selected range (sheet-level) ---
           if (uniqueTrack[internal]) {
-            var strVal = String(raw || '').trim();
+            let strVal = String(raw || '').trim();
             if (strVal) {
-              var seenMap = uniqueTrack[internal].seen;
+              let seenMap = uniqueTrack[internal].seen;
               if (seenMap[strVal] >= 1) {
                 issues.push({ row: dispRow, column: (f.Title || internal), detail: 'Duplicate value "' + strVal + '".', type: 'unique' });
               }
@@ -1179,7 +1179,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       // Only run if we have any unique fields with values
       const uniqueFieldsWithValues: { field: any; values: string[] }[] = [];
       for (const internal in uniqueTrack) {
-        if (!uniqueTrack.hasOwnProperty(internal)) continue;
+        if (!Object.prototype.hasOwnProperty.call(uniqueTrack, internal)) continue;
         const track = uniqueTrack[internal];
         const values = Object.keys(track.seen).filter(v => track.seen[v] > 0);
         if (values.length > 0) {
@@ -1227,16 +1227,16 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
                 });
               }
             }
-          } catch (err:any)  {
+          } catch (err: any) {
             console.warn(`Failed to validate uniqueness in SP for field ${internal}:`, err);
-            LoggerService.log(selectedList || 'System', 'runDataValidation-unique - ' + this.state.jobName, 'Medium', this.state.mode, err.message);
+            void LoggerService.log(selectedList || 'System', 'runDataValidation-unique - ' + this.state.jobName, 'Medium', this.state.mode, err.message);
           }
         }
       }
       // Summarize counts
-      var counts = { required: 0, number: 0, choice: 0, unique: 0, user: 0, total: issues.length };
-      for (var k = 0; k < issues.length; k++) {
-        var t = issues[k].type;
+      let counts = { required: 0, number: 0, choice: 0, unique: 0, user: 0, total: issues.length };
+      for (let k = 0; k < issues.length; k++) {
+        let t = issues[k].type;
         if (t === 'required') counts.required++;
         else if (t === 'number') counts.number++;
         else if (t === 'choice') counts.choice++;
@@ -1249,8 +1249,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         issueCounts: counts,
         validationError: issues.length ? '' : ''
       });
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'runDataValidation - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'runDataValidation - ' + this.state.jobName, 'High', this.state.mode, e.message);
       this.setState({ validationError: 'Validation Failed: ' + (e as any).message });
     }
   }
@@ -1259,8 +1259,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       if (val == null) return '';
       const str = String(val);
       return str.replace(/<[^>]*>/g, '').trim();
-    } catch (e:any) {
-      LoggerService.log('System', 'cleanCell - ' + this.state.jobName, 'Low', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'cleanCell - ' + this.state.jobName, 'Low', this.state.mode, e.message);
       return '';
     }
   }
@@ -1284,8 +1284,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       a.click();
       document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 0);
-    } catch (e:any) {
-      LoggerService.log('System', 'downloadValidationErrors - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'downloadValidationErrors - ' + this.state.jobName, 'Medium', this.state.mode, e.message);
     }
   }
   // -------------- Build payload --------------
@@ -1396,7 +1396,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             try {
               const ensureRes: any = await this.sp.web.ensureUser(raw);
               userId = ensureRes.data.Id;
-            } catch (err:any)  {
+            } catch (err: any) {
               const found = await this.sp.web.siteUsers
                 .filter("Title eq '" + escapeOdataValue(raw) + "'")
                 .select('Id')
@@ -1421,8 +1421,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         data[internal] = val;
       }
       return data;
-    } catch (e:any) {
-      LoggerService.log(this.state.selectedList || 'System', 'buildItemData - ' + this.state.jobName, 'High', this.state.mode, e.message);
+    } catch (e: any) {
+      void LoggerService.log(this.state.selectedList || 'System', 'buildItemData - ' + this.state.jobName, 'High', this.state.mode, e.message);
       throw e;
     }
   }
@@ -1432,11 +1432,11 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
   private async ensureLibrary(title: string): Promise<void> {
     try {
       await this.sp.web.lists.getByTitle(title).select('Id')();
-    } catch (e:any) {
+    } catch (e: any) {
       try {
         await this.sp.web.lists.add(title, title + ' library', 101, true);
       } catch (e2: any) {
-        LoggerService.log('System', 'ensureLibrary - ' + title, 'High', 'N/A', e2.message);
+        void LoggerService.log('System', 'ensureLibrary - ' + title, 'High', 'N/A', e2.message);
       }
     }
   }
@@ -1450,15 +1450,15 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         const part = parts[i];
         try {
           await this.sp.web.getFolderByServerRelativePath(currentUrl).folders.addUsingPath(part);
-        } catch (e:any) {
+        } catch (e: any) {
           // Folder likely exists, log as low severity info if critical debugging needed
-          LoggerService.log('System', 'ensureFolderPath(loop) - ' + path, 'Low', 'N/A', e.message);
+          void LoggerService.log('System', 'ensureFolderPath(loop) - ' + path, 'Low', 'N/A', e.message);
         }
         currentUrl = currentUrl + '/' + encodeURIComponent(part);
       }
       return this.sp.web.getFolderByServerRelativePath(currentUrl);
-    } catch (e:any) {
-      LoggerService.log('System', 'ensureFolderPath(outer) - ' + path, 'Medium', 'N/A', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'ensureFolderPath(outer) - ' + path, 'Medium', 'N/A', e.message);
       throw e;
     }
   }
@@ -1555,9 +1555,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             baseFailureCount: baseFailure,
             basePlannedCount: basePlanned
           });
-        } catch (e:any) {
+        } catch (e: any) {
           console.warn('Failed to load selected DataSycnHistory item', e);
-          LoggerService.log(this.props.metricsListTitle, 'handleImport-resumeLoad', 'High', mode, e.message);
+          void LoggerService.log(this.props.metricsListTitle, 'handleImport-resumeLoad', 'High', mode, e.message);
           this.setState({ isLoading: false, validationError: 'Could not load the selected job. Try again.' });
           return;
         }
@@ -1578,7 +1578,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
             this.goToStep(1);
             return;
           }
-        } catch (e:any) {
+        } catch (e: any) {
           // Ignore check errors
         }
       }
@@ -1599,8 +1599,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           await srcFolder.files.add(sourceFileName, sourceFileBuffer, true);
           sourceUrl = window.location.origin + '/' + libRoot + '/' + encodeURIComponent(jobName) + '/Source/' + encodeURIComponent(sourceFileName);
           this.setState({ sourceFileUrl: sourceUrl });
-        } catch (e:any) {
-          LoggerService.log(this.props.metricsLibTitle, 'handleImport-uploadSource', 'Medium', mode, e.message);
+        } catch (e: any) {
+          void LoggerService.log(this.props.metricsLibTitle, 'handleImport-uploadSource', 'Medium', mode, e.message);
         }
       }
 
@@ -1622,7 +1622,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           });
           historyItemId = addRes.data.Id;
           this.setState({ historyItemId });
-        } catch (e:any) {
+        } catch (e: any) {
           console.warn("Failed to create history item", e);
         }
       } else if (historyItemId && sourceUrl) {
@@ -1630,7 +1630,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           await this.sp.web.lists.getByTitle(this.props.metricsListTitle).items.getById(historyItemId).update({
             SourceFile: { Url: sourceUrl, Description: sourceFileName || 'Source file' }
           });
-        } catch (e:any) { }
+        } catch (e: any) { }
       }
 
       // Re-validate Data
@@ -1656,7 +1656,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         }
       } catch (permErr) {
         this.setState({ isLoading: false, validationError: 'Permission denied on list: ' + selectedList });
-        if (this.props.showUserAlerts) Swal.fire('Permission denied', 'You do not have rights to modify this list.', 'error');
+        if (this.props.showUserAlerts) void Swal.fire('Permission denied', 'You do not have rights to modify this list.', 'error');
         return;
       }
 
@@ -1671,7 +1671,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           await this.sp.web.lists.getByTitle(this.props.metricsListTitle).items.getById(historyItemId).update({
             ItemstoImport: (this.state.basePlannedCount || 0) + plannedTotalThisRun
           });
-        } catch (e:any) { }
+        } catch (e: any) { }
       }
 
       this.setState({ progress: 0, completed: 0, total: plannedTotalThisRun });
@@ -1783,7 +1783,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
 
       // Show Simple Notification (Only if alerts enabled)
       if (this.props.showUserAlerts) {
-        await Swal.fire({
+        await void Swal.fire({
           title: 'Import Finished',
           html: `
                <p>${successRows.length} succeeded, ${failureRows.length} failed.</p>
@@ -1794,9 +1794,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
         });
       }
 
-    } catch (e:any) {
+    } catch (e: any) {
       this.setState({ isLoading: false, validationError: 'Critical Error: ' + e.message });
-      LoggerService.log('System', 'handleImport', 'High', this.state.mode, e.message);
+      void LoggerService.log('System', 'handleImport', 'High', this.state.mode, e.message);
     }
   }
 
@@ -1804,8 +1804,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
     try {
       const match = fileName.match(/^failure_([^_]+)_/);
       return match ? match[1] : null;
-    } catch (e:any) {
-      LoggerService.log('System', 'extractSheetFromFailureFileName', 'Low', 'N/A', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'extractSheetFromFailureFileName', 'Low', 'N/A', e.message);
       return null;
     }
   }
@@ -1818,9 +1818,9 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       const targetPath = successFolder.ServerRelativeUrl + '/' + sourceFileName;
       const file = this.sp.web.getFileByServerRelativePath(filePath);
       await (file as any).moveToPath(targetPath, { Overwrite: true });
-    } catch (err:any)  {
+    } catch (err: any) {
       console.warn('Failed to move source file to Success folder', err);
-      LoggerService.log(this.props.metricsLibTitle, 'moveSourceFileToSuccess - ' + jobName, 'Medium', this.state.mode, err.message);
+      void LoggerService.log(this.props.metricsLibTitle, 'moveSourceFileToSuccess - ' + jobName, 'Medium', this.state.mode, err.message);
     }
   }
   //  -------------- Exit to Dashboard --------------
@@ -1831,20 +1831,20 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       } else {
         this.setState({ currentStep: 1 });
       }
-    } catch (e:any) {
-      LoggerService.log('System', 'handleExitToDashboard', 'Medium', 'N/A', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'handleExitToDashboard', 'Medium', 'N/A', e.message);
     }
   }
   // Extend original Excel row with status and optional error details
   private extendRowWithStatus = (row: any, dataSyncMigrationstatus: string, dataSyncErrorDetails?: string) => {
     try {
       const copy: any = {};
-      for (const k in row) if (row.hasOwnProperty(k)) copy[k] = row[k];
+      for (const k in row) if (Object.prototype.hasOwnProperty.call(row, k)) copy[k] = row[k];
       copy.dataSyncMigrationstatus = dataSyncMigrationstatus;
       if (dataSyncErrorDetails) copy.dataSyncErrorDetails = dataSyncErrorDetails;
       return copy;
-    } catch (e:any) {
-      LoggerService.log('System', 'extendRowWithStatus', 'Low', 'N/A', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'extendRowWithStatus', 'Low', 'N/A', e.message);
       return row;
     }
   }
@@ -1863,7 +1863,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
       // 1. Calculate columns used globally (outer scope)
       const usedExcelCols: string[] = [];
       for (const k in excelMapByField) {
-        if (excelMapByField.hasOwnProperty(k) && excelMapByField[k]) {
+        if (Object.prototype.hasOwnProperty.call(excelMapByField, k) && excelMapByField[k]) {
           usedExcelCols.push(excelMapByField[k]);
         }
       }
@@ -1910,7 +1910,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
                   return;
                 }
                 if (this.validateStep(currentStep)) {
-                  if (s.n === 4 && currentStep <= 3) { this.runDataValidation(); }
+                  if (s.n === 4 && currentStep <= 3) { void this.runDataValidation(); }
                   this.goToStep(s.n);
                 }
               };
@@ -2046,7 +2046,7 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
                       //  Variable Shadowing - renamed to 'otherMappedCols'
                       const otherMappedCols: string[] = [];
                       for (const key in excelMapByField) {
-                        if (excelMapByField.hasOwnProperty(key) && key !== f.InternalName && excelMapByField[key]) {
+                        if (Object.prototype.hasOwnProperty.call(excelMapByField, key) && key !== f.InternalName && excelMapByField[key]) {
                           otherMappedCols.push(excelMapByField[key]);
                         }
                       }
@@ -2259,8 +2259,8 @@ export default class PowerDataSync extends React.Component<IPowerDataSyncProps, 
           </div>
         </div >
       );
-    } catch (e:any) {
-      LoggerService.log('System', 'render', 'High', 'UI', e.message);
+    } catch (e: any) {
+      void LoggerService.log('System', 'render', 'High', 'UI', e.message);
       return <div>Critical Error in Render: {e.message}</div>;
     }
   }
