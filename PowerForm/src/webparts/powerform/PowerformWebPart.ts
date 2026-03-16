@@ -183,7 +183,7 @@ export interface INotificationRule {
 // --- HELPER COMPONENT: CheckboxListEditor ---
 // An alternative to MultiSelect, renders checkboxes in a scrollable div.
 // Supports a max selection limit.
-class CheckboxListEditor extends React.Component<{
+export class CheckboxListEditor extends React.Component<{
   label: string;
   options: { key: string; text: string }[];
   selectedKeys: string[];
@@ -846,9 +846,7 @@ export default class PowerFormWebPart extends BaseClientSideWebPart<IPowerFormWe
     }
   }
   public async onInit(): Promise<void> {
-    // const sp = (spfi() as any).use(SPFx(this.context));
-    // this._sp = sp;
-    this._sp = spfi().using(SPFx(this.context));
+     this._sp = spfi().using(SPFx(this.context));
     try {
 
       const style = document.createElement('style');

@@ -1,7 +1,7 @@
 
-@import '../../../../node_modules/@microsoft/sp-office-ui-fabric-core/dist/sass/_SPFabricCore.scss';
+//@import '../../../../node_modules/@microsoft/sp-office-ui-fabric-core/dist/sass/_SPFabricCore.scss';
 
-//@import '~@fluentui/react/dist/sass/References.scss';
+@import '~@fluentui/react/dist/sass/References.scss';
 /* ==========================================================================
    GLOBAL SHAREPOINT OVERRIDES
    These styles escape the CSS Modules scope (:global) to target 
@@ -37,18 +37,18 @@
   /* Hide the default Page Title area to reclaim space */
   .pageTitle_dececfca,
   div[class*="pageTitle_"] {
-    display: none !important;
+    //display: none !important;
   }
 
   /*  Apply negative margin to the canvas wrapper to remove whitespace */
   div[data-automation-id="CanvasControl"],
   .CanvasZone {
-    margin-top: -45px !important;
+    //margin-top: -45px !important;
   }
 
   /* Target specific SharePoint wrapper class if present */
   .canvasWrapper {
-    margin-top: -45px !important;
+    //margin-top: -45px !important;
   }
 }
 
