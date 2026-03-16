@@ -2,13 +2,14 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import Swal from 'sweetalert2';
-import { spfi, SPFx, SPFI } from "@pnp/sp";
+import { spfi, SPFI, SPFx } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/views";
 import "@pnp/sp/security";
+
 import "@pnp/sp/site-users";
 import "@pnp/sp/site-groups";
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
@@ -845,7 +846,11 @@ export default class PowerFormWebPart extends BaseClientSideWebPart<IPowerFormWe
     }
   }
   public async onInit(): Promise<void> {
+    // const sp = (spfi() as any).use(SPFx(this.context));
+    // this._sp = sp;
+    this._sp = spfi().using(SPFx(this.context));
     try {
+
       const style = document.createElement('style');
       style.type = 'text/css';
       style.innerHTML = `
@@ -970,12 +975,17 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
           width: 100% !important;
         }
         
-        /* 6. Allow horizontal scrolling generally inside the panel content */
-        .spPropertyPaneContainer .ms-Panel-scrollableContent,
-        div[class*="spPropertyPaneContainer"] .ms-Panel-scrollableContent {
-          overflow-x: hidden; /* Hide main scrollbar, let specific tables scroll */
-          width: 100% !important;
-        }
+         /* Updated CSS inside onPropertyPaneConfigurationStart */
+.spPropertyPaneContainer .ms-Panel-scrollableContent,
+div[class*="spPropertyPaneContainer"] .ms-Panel-scrollableContent {
+  overflow-x: auto !important; /* Enable horizontal scroll */
+  display: block !important;
+}
+
+.ms-PropertyPaneGroup-content {
+  overflow-x: auto !important;
+  min-width: 300px; /* Ensures a base width */
+}
       `;
       //Ensure CSS is injected
       if (!document.getElementById('custom-pp-width-FIXED')) {
@@ -1256,33 +1266,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
       void LoggerService.log('PowerFormWebPart-render', 'High', 'Config', error.message || JSON.stringify(error));
     }
   }
-  // --- PROPERTY PANE HELPER METHODS ---
-  private getConfigurationActionGroup_hold() {
-    return {
-      groupName: 'Panel Actions',
-      groupFields: [
-        PropertyPaneButton('btnSaveConfig', {
-          text: 'Save Configuration',
-          buttonType: PropertyPaneButtonType.Primary,
-          icon: 'Save',
-          onClick: () => {
-            void Swal.fire({ icon: 'success', title: 'success', text: "Configuration saved successfully!" });
-            (this.context.propertyPane as any).close();
-          }
-        }) as any,
-        PropertyPaneButton('btnCancelConfig', {
-          text: 'Cancel & Reload',
-          buttonType: PropertyPaneButtonType.Normal,
-          icon: 'Cancel',
-          onClick: () => {
-            if (confirm('Are you sure? This will reload the page and revert unsaved UI changes.')) {
-              window.location.reload(); // Refresh the page
-            }
-          }
-        }) as any
-      ]
-    };
-  }
+  
 
   private getConfigurationActionGroup() {
     return {
@@ -1730,6 +1714,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
                 }
                 this.context.propertyPane.refresh();
               };
+              
               children.push(
                 React.createElement('button', {
                   style: iconBtnStyle(isConfiguringLookup || !!hasLookupCfg, '#8764b8'),
@@ -1766,6 +1751,7 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
                 }
                 this.context.propertyPane.refresh();
               };
+             
               const hasCascade = this.properties.cascadeConfig && this.properties.cascadeConfig[field.key];
               children.push(
                 React.createElement('button', {
@@ -2310,6 +2296,18 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
   }
   private async provisionLogEnvironment(): Promise<void> {
     const { logListTitle, logRoleName } = this.properties;
+    if (!this._sp) {
+      console.error("PnPjs was not initialized.");
+      return;
+    }
+
+    // Now just use it
+    const web = this._sp.web;
+
+    if (!logListTitle || !logRoleName) {
+      void Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter both a Log List Name and a Role Name." });
+      return;
+    }
     if (!logListTitle || !logRoleName) {
       void Swal.fire({ icon: 'info', title: 'Missing Info', text: "Please enter both a Log List Name and a Role Name." });
       return;
@@ -2323,7 +2321,6 @@ div[class*="spPropertyPaneContainer"] button[class*="header"] {
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
       });
-      const web = this._sp.web;
 
       // Check if list exists
       try {

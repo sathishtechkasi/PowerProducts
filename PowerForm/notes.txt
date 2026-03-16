@@ -24,3 +24,17 @@ Check all code upto latest and api
 
 export NODE_OPTIONS=--max_old_space_size=8192
 heft build package-solution --production
+
+___________________________________________________________________________________________________________________
+
+TODO
+Remove Other css which hide the other section if they can do through this
+ horizontal scroll or increase configure width
+
+ Form Layout
+ Next button should be active only if those fileds meets the validaition
+ 
+
+Child link - list field modification
+
+Addtional buttons with configure based on status what should show and not , and preset the satatus this is for workflow , so users will not edit any fileds but they view and edit only designated fiedds
